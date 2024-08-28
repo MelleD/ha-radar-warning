@@ -40,7 +40,7 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
         """Perform first refresh."""
         self._latitude = self.config_entry.data.get(CONF_LATITUDE, 0)
         self._longitude = self.config_entry.data.get(CONF_LONGITUDE, 0)
-        self._radius = self.config_entry.data.get(CONF_RADIUS, 10)
+        self._radius = self.config_entry.data.get(CONF_RADIUS, 10.0)
         self.api = RadarWarningApi(self._latitude, self._longitude, self._radius)
 
         await self._async_update_data()

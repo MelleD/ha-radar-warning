@@ -49,7 +49,7 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                     ): cv.longitude,
                      vol.Required(
                          CONF_RADIUS, default=self.hass.config.radius
-                    ): cv.string,
+                    ): cv.positive_float,
                 }
             ),
         )
