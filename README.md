@@ -1,4 +1,4 @@
-# Expander Card for HomeAssistant
+# Radar warning for HomeAssistant
 
 [![release][release-badge]][release-url]
 ![downloads][downloads-badge]
