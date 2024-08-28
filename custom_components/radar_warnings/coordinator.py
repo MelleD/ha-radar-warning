@@ -31,10 +31,10 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
 
     config_entry: RadarWarningsConfigEntry
 
-    def __init__(self, hass: HomeAssistant, entry: RadarWarningsConfigEntry, scan_interval: timedelta ) -> None:
+    def __init__(self, hass: HomeAssistant, entry: RadarWarningsConfigEntry ) -> None:
         """Initialize the radar_warnings coordinator."""
         super().__init__(
-            hass, LOGGER, name=DOMAIN, update_interval=scan_interval
+            hass, LOGGER, name=DOMAIN, update_interval=None
         )
         self.config_entry = entry
 
@@ -43,7 +43,7 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
         self._latitude = self.config_entry.data.get(CONF_LATITUDE, 0)
         self._longitude = self.config_entry.data.get(CONF_LONGITUDE, 0)
         self._radius = self.config_entry.data.get(CONF_RADIUS, 10.0)
-        #self.update_interval = self.config_entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+        self.update_interval = self.config_entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
         self.api = RadarWarningApi(self._latitude, self._longitude, self._radius)
 
         await self._async_update_data()

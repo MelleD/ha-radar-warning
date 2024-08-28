@@ -55,7 +55,7 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                      vol.Required(
                          CONF_RADIUS, default=self.hass.config.radius
                     ): cv.positive_float,
-                    vol.Required(
+                    vol.Optional(
                          CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
                     ): cv.time_period
                 }
