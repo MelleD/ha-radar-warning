@@ -6,8 +6,7 @@ from .radar_api import RadarWarningApi
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
-from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
-from homeassistant.util import location
+from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
 from .const import (
     CONF_ZONE_ENTITY,
@@ -20,8 +19,6 @@ from homeassistant.const import (
     CONF_RADIUS
 )
 
-
-from .exceptions import EntityNotFoundError
 from .util import get_zone_position_data
 
 type RadarWarningsConfigEntry = ConfigEntry[RadarWarningsCoordinator]

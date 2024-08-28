@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from typing import Any
 
-from .radar_api import RadarWarningApi
 import voluptuous as vol
 
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
@@ -20,11 +19,10 @@ from homeassistant.const import (
 from .exceptions import EntityNotFoundError
 from .util import get_zone_position_data
 
-EXCLUSIVE_OPTIONS = (CONF_ZONE_ENTITY, CONF_RADIUS)
-
-
 class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
     """Handle the config flow for the radar_warnings integration."""
+
+    VERSION = 1
 
     async def async_step_user(
         self, user_input: dict[str, Any] | None = None
