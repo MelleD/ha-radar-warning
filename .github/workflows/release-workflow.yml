@@ -22,6 +22,7 @@ jobs:
           git config user.email github-actions@github.com
       - name: Update version in manifest.json
         run: |
+          cd ${{ github.workspace }}/custom_components/radar_warnings
           jq '.version = "${{ github.event.inputs.release_version }}"' manifest.json > temp.json
           mv temp.json manifest.json
 

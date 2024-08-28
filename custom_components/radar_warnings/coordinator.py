@@ -16,7 +16,6 @@ from .const import (
 )
 
 from homeassistant.const import (
-    CONF_SCAN_INTERVAL,
     CONF_RADIUS,
     CONF_LATITUDE, 
     CONF_LONGITUDE
