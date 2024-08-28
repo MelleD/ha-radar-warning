@@ -1,0 +1,11 @@
+{
+    "domain": "radar_warner",
+    "name": "Radar Warner",
+    "codeowners": ["@MelleD"],
+    "config_flow": true,
+    "documentation": "https://github.com/rany2/ha-open-meteo-solar-forecast",
+    "integration_type": "service",
+    "iot_class": "cloud_polling",
+    "issue_tracker": "https://github.com/rany2/ha-open-meteo-solar-forecast/issues",
+    "version": "0.0.1"
+  }

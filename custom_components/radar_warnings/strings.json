@@ -1,0 +1,36 @@
+{
+    "config": {
+      "step": {
+        "user": {
+          "description": "To identify the desired zone, the zone entity is required. The provided zone has to contain the attributes 'latitude' and 'longitude'.",
+          "data": {
+            "zone_entity": "Zone entity",
+            "radius": "The radius in km"
+          }
+        }
+      },
+      "error": {
+        "zone_entity_not_found": "The specified zoner entity was not found.",
+        "attribute_not_found": "The required `latitude` or `longitude` attribute was not found in the specified zone entity."
+      },
+      "abort": {
+        "already_configured": "[%key:common::config_flow::abort::already_configured_device%]",
+        "invalid_identifier": "[%key:component::radar_warnings::config::error::invalid_identifier%]"
+      }
+    },
+    "entity": {
+      "sensor": {
+        "radar_warning": {
+          "name": "Radar warning count",
+          "state_attributes": {
+            "last_update": {
+              "name": "Last update"
+            },
+            "warning_count": {
+              "name": "Warning count"
+            }
+          }
+        }
+      }
+    }
+  }
