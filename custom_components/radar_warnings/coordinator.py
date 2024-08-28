@@ -31,10 +31,10 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
     config_entry: RadarWarningsConfigEntry
     api: RadarWarningApi
 
-    def __init__(self, hass: HomeAssistant, entry: RadarWarningsConfigEntry) -> None:
+    def __init__(self, hass: HomeAssistant, entry: RadarWarningsConfigEntry, scan_interval: timedelta) -> None:
         """Initialize the radar_warnings coordinator."""
         super().__init__(
-            hass, LOGGER, name=DOMAIN, update_interval=timedelta(minutes=self.config_entry.data.get(CONF_SCAN_INTERVAL, 60))
+            hass, LOGGER, name=DOMAIN, update_interval=scan_interval
         )
         self.config_entry = entry
 

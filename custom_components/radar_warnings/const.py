@@ -5,6 +5,8 @@ from __future__ import annotations
 import logging
 from typing import Final
 
+from datetime import timedelta
+
 from homeassistant.const import Platform
 
 LOGGER = logging.getLogger(__package__)
@@ -20,5 +22,7 @@ API_ATTR_WARNING_VMAX: Final = "vmax"
 DEFAULT_NAME: Final = "Radar Warnings"
 
 RADAR_WARNING_SENSOR: Final = "radar_warnings"
+
+DEFAULT_SCAN_INTERVAL = timedelta(minutes=60)
 
 PLATFORMS: Final[list[Platform]] = [Platform.SENSOR]

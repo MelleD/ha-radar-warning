@@ -9,7 +9,7 @@ import voluptuous as vol
 from homeassistant.config_entries import ConfigFlow, ConfigFlowResult
 import homeassistant.helpers.config_validation as cv
 
-from .const import DOMAIN
+from .const import DOMAIN, DEFAULT_SCAN_INTERVAL
 from homeassistant.const import (
     CONF_NAME,
     CONF_RADIUS,
@@ -52,8 +52,8 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                          CONF_RADIUS, default=self.hass.config.radius
                     ): cv.positive_float,
                     vol.Required(
-                         CONF_SCAN_INTERVAL, default=60
-                    ): cv.positive_float
+                         CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
+                    ): cv.time_period
                 }
             ),
         )
