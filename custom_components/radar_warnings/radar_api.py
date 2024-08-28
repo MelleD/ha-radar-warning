@@ -85,6 +85,7 @@ class RadarWarningApi:
 
 
     def update_pois(self):
+        LOGGER.debug("start poi update")
         self.last_update = None
         all_pois = set()
 
@@ -100,3 +101,4 @@ class RadarWarningApi:
 
         self.last_update = datetime.now(UTC)
         self.pois = all_pois
+        LOGGER.debug("end poi update")

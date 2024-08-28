@@ -12,7 +12,8 @@ import homeassistant.helpers.config_validation as cv
 from .const import DOMAIN
 from homeassistant.const import (
     CONF_NAME,
-    CONF_RADIUS
+    CONF_RADIUS,
+    CONF_SCAN_INTERVAL
 )
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
 
@@ -50,6 +51,9 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                      vol.Required(
                          CONF_RADIUS, default=self.hass.config.radius
                     ): cv.positive_float,
+                    vol.Required(
+                         CONF_SCAN_INTERVAL, default=60
+                    ): cv.positive_float
                 }
             ),
         )

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from datetime import timedelta
 import logging
 from typing import Final
 
@@ -19,7 +18,6 @@ API_ATTR_WARNING_STREET: Final = "street"
 API_ATTR_WARNING_VMAX: Final = "vmax"
 
 DEFAULT_NAME: Final = "Radar Warnings"
-DEFAULT_SCAN_INTERVAL: Final = timedelta(minutes=60)
 
 RADAR_WARNING_SENSOR: Final = "radar_warnings"
 

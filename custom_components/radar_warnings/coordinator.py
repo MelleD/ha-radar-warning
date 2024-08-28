@@ -8,13 +8,15 @@ from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
 
+from datetime import timedelta
+
 from .const import (
-    DEFAULT_SCAN_INTERVAL,
     DOMAIN,
     LOGGER,
 )
 
 from homeassistant.const import (
+    CONF_SCAN_INTERVAL,
     CONF_RADIUS,
     CONF_LATITUDE, 
     CONF_LONGITUDE
@@ -32,7 +34,7 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
     def __init__(self, hass: HomeAssistant, entry: RadarWarningsConfigEntry) -> None:
         """Initialize the radar_warnings coordinator."""
         super().__init__(
-            hass, LOGGER, name=DOMAIN, update_interval=DEFAULT_SCAN_INTERVAL
+            hass, LOGGER, name=DOMAIN, update_interval=timedelta(minutes=self.config_entry.data.get(CONF_SCAN_INTERVAL, 60))
         )
         self.config_entry = entry
 
