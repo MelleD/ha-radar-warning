@@ -28,7 +28,6 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
     """Custom coordinator for the radar_warnings integration."""
 
     config_entry: RadarWarningsConfigEntry
-    api: RadarWarningApi
 
     def __init__(self, hass: HomeAssistant, entry: RadarWarningsConfigEntry, scan_interval: timedelta) -> None:
         """Initialize the radar_warnings coordinator."""

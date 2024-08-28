@@ -29,6 +29,10 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
         errors: dict = {}
 
         if user_input is not None:
+            identifier = f"{user_input[CONF_NAME]}_{user_input[CONF_LATITUDE]}_{user_input[CONF_LONGITUDE]}"
+            # Set the unique ID for this config entry.
+            await self.async_set_unique_id(identifier)
+            self._abort_if_unique_id_configured()
             return self.async_create_entry(
                         title=user_input[CONF_NAME],
                         data=user_input
