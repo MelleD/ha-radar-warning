@@ -15,7 +15,7 @@ from homeassistant.const import (
 
 async def async_setup_entry(hass: HomeAssistant, entry: RadarWarningsConfigEntry) -> bool:
     """Set up a config entry."""
-    scan_interval = entry.options.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
+    scan_interval = entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL)
     coordinator = RadarWarningsCoordinator(hass, entry, scan_interval)
     await coordinator.async_config_entry_first_refresh()
 
