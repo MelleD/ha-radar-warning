@@ -1,11 +1,13 @@
-import asyncio
 import json
-import socket
-import aiohttp
 import math
+import aiohttp
+import asyncio
+import socket
+
 from geopy.distance import geodesic
 from geopy.point import Point
 from datetime import UTC, datetime
+
 
 class POI:
     def __init__(self, id, latitude, longitude, street, vmax, distance):
@@ -28,62 +30,68 @@ class POI:
                 f"Max Geschwindigkeit={self.vmax} km/h, Distanz={self.distance:.2f} km)")
 
 class RadarWarningApi:
-    def __init__(self,latitude: float, longitude: float, radius_km: float):
+    def __init__(self,latitude: float, longitude: float, radius_km: float, session: aiohttp.client.ClientSession | None = None):
         self.latitude = latitude
         self.longitude = longitude 
         self.radius_km = radius_km
         self.last_update = None
-        self.pois = self.update_pois()
+        self._session = session
+        self._close_session = False
+        self.pois = set()
 
     def __len__(self):
         """Return the count of pois."""
         return len(self.pois)
 
+    def get_coordinates(self, grad: int):
+        abstand = math.sqrt(self.radius_km*self.radius_km + self.radius_km*self.radius_km) * 1000  # Angabe in Meter!
+        
+        # Wegpunktprojektion berechnen
+        dnord = (math.cos(math.radians(grad)) * abstand) / 1850  # Ergebnis in Grad
+        dost = (math.sin(math.radians(grad)) * abstand) / (1850 * math.cos(math.radians(self.latitude)))
+        new_lat = self.latitude + dnord / 60
+        new_lng = self.longitude + dost / 60
+        
+        return new_lat, new_lng
+
     def get_url(self):
         get_type = "0,1,2,3,4,5,6"
-        area_top_right_coordinates = self.blitzer_get_coordinates(45)
+        area_top_right_coordinates = self.get_coordinates(45)
         area_top_right_latitude=area_top_right_coordinates[0]
         area_top_right_longitude=area_top_right_coordinates[1]
-        area_top_left_coordinates = self.blitzer_get_coordinates(225)
+        area_top_left_coordinates = self.get_coordinates(225)
         area_top_left_latitude=area_top_left_coordinates[0]
         area_top_left_longitude=area_top_left_coordinates[1]
 
         return f"https://cdn2.atudo.net/api/1.0/vl.php?type={get_type}&box={area_top_left_latitude},{area_top_left_longitude},{area_top_right_latitude},{area_top_right_longitude}"
 
-
-    def get_poi(self):
+    async def get_pois(self):
         url = self.get_url()
-        pois = set()
         http_timeout = 5
 
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+            self._close_session = True
+
         try:
-            async with asyncio.timeout(self.request_timeout):
-                response = await self._session.request(
-                    method,
-                    url,
-                    auth=auth,
-                    data=data,
-                    json=json_data,
-                    params=params,
-                    headers=headers,
-                    ssl=self.verify_ssl,
-                    skip_auto_headers=skip_auto_headers,
-                )
+            async with asyncio.timeout(http_timeout):
+                response = await self._session.get(url)
         except asyncio.TimeoutError as exception:
-            msg = "Timeout occurred while connecting to AdGuard Home instance."
-            raise AdGuardHomeConnectionError(msg) from exception
+            msg = "Timeout occurred while connecting to Radar warnings instance."
+            raise RadarWarningConnectionError(msg) from exception
         except (aiohttp.ClientError, socket.gaierror) as exception:
-            msg = "Error occurred while communicating with AdGuard Home."
-            raise AdGuardHomeConnectionError(msg) from exception
+            msg = "Error occurred while communicating with Radar warnings instance."
+            raise RadarWarningConnectionError(msg) from exception
+        
+        if response.status // 100 in [4, 5]:
+            contents = await response.read()
+            response.close()
+            raise RadarWarningConnectionError(
+                response.status, json.loads(contents.decode("utf8"))
+            )
 
-
-
-
-
-
-        response = requests.get(url, timeout=http_timeout)
-        response.raise_for_status()
-        data = response.json()
+        data = await response.json()
+        pois = set()
 
         # Durch die pois iterieren und das info-Feld als Dictionary parsen
         for poi in data['pois']:
@@ -107,29 +115,29 @@ class RadarWarningApi:
 
         return pois
     
-    def blitzer_get_coordinates(self, grad: int):
-        abstand = math.sqrt(self.radius_km*self.radius_km + self.radius_km*self.radius_km) * 1000  # Angabe in Meter!
-        
-        # Wegpunktprojektion berechnen
-        dnord = (math.cos(math.radians(grad)) * abstand) / 1850  # Ergebnis in Grad
-        dost = (math.sin(math.radians(grad)) * abstand) / (1850 * math.cos(math.radians(self.latitude)))
-        new_lat = self.latitude + dnord / 60
-        new_lng = self.longitude + dost / 60
-        
-        return new_lat, new_lng
+    async def close(self) -> None:
+        """Close open client session."""
+        print("Close Session")
+        if self._session and self._close_session:
+            print("Close Session 1")
+            await self._session.close()
 
 
-    def update_pois(self):
-        print("Start update_pois")
+    async def update_pois(self):
+        print("start poi update")
         self.last_update = None
-        all_pois = self.get_poi()
-
-        # Ausgabe der gesammelten POIs
-        for poi in all_pois:
+        self.pois = await self.get_pois()
+        for poi in self.pois:
             print(poi)
-
+       
         self.last_update = datetime.now(UTC)
-        self.pois = all_pois
+        await self.close()
+        print("end poi update")
 
-api = RadarWarningApi(48.644854635295175,8.895243108272554,20)
-#api = RadarWarningApi(52.288659,13.411855,20)
+async def main():
+    api = RadarWarningApi(48.644854635295175,8.895243108272554,20)
+    #api = RadarWarningApi(52.288659,13.411855,20)
+    await api.update_pois()  # Korrekt: 'await' verwenden, um die coroutine auszuführen
+
+# Starte das Hauptprogramm asynchron
+asyncio.run(main())

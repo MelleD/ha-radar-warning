@@ -39,12 +39,8 @@ class RadarWarningApi:
         self.longitude = longitude 
         self.radius_km = radius_km
         self.last_update = None
-        self.pois = self.get_pois()
         self._session = session
         self._close_session = False
-        if self._session is None:
-            self._session = aiohttp.ClientSession()
-            self._close_session = True
 
 
     def __len__(self):
@@ -76,6 +72,9 @@ class RadarWarningApi:
     async def get_pois(self):
         url = self.get_url()
         http_timeout = 5
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+            self._close_session = True
 
         try:
             async with asyncio.timeout(http_timeout):
@@ -119,12 +118,19 @@ class RadarWarningApi:
 
         return pois
 
+    async def close(self) -> None:
+        """Close open client session."""
+        if self._session and self._close_session:
+            await self._session.close()
 
-    def update_pois(self):
+    async def update_pois(self):
         LOGGER.debug("start poi update")
         self.last_update = None
-        for poi in self.get_pois:
+        pois = await self.get_pois
+        self.pois = pois;
+        for poi in self.pois:
             LOGGER.debug(poi)
 
+        await self.close()
         self.last_update = datetime.now(UTC)
         LOGGER.debug("end poi update")
