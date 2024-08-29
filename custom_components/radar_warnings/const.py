@@ -23,6 +23,6 @@ DEFAULT_NAME: Final = "Radar Warnings"
 
 RADAR_WARNING_SENSOR: Final = "radar_warnings"
 
-DEFAULT_SCAN_INTERVAL = timedelta(minutes=60)
+DEFAULT_SCAN_INTERVAL = 60
 
 PLATFORMS: Final[list[Platform]] = [Platform.SENSOR]
