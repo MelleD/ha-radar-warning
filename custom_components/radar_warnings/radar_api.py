@@ -35,13 +35,13 @@ class RadarWarningApi:
         self.longitude = longitude 
         self.radius_km = radius_km
         self.last_update = None
-        self.pois = set()
+        self.pois = self.get_pois()
 
     def __len__(self):
         """Return the count of pois."""
         return len(self.pois)
 
-    def get_coordinates(self):
+    def get_coordinates(self, grad: int):
         abstand = math.sqrt(self.radius_km*self.radius_km + self.radius_km*self.radius_km) * 1000  # Angabe in Meter!
         
         # Wegpunktprojektion berechnen
@@ -52,7 +52,7 @@ class RadarWarningApi:
         
         return new_lat, new_lng
 
-    def get_url(self, direction: float):
+    def get_url(self):
         get_type = "0,1,2,3,4,5,6"
         area_top_right_coordinates = self.get_coordinates(45)
         area_top_right_latitude=area_top_right_coordinates[0]
@@ -63,13 +63,13 @@ class RadarWarningApi:
 
         return f"https://cdn2.atudo.net/api/1.0/vl.php?type={get_type}&box={area_top_left_latitude},{area_top_left_longitude},{area_top_right_latitude},{area_top_right_longitude}"
 
-    def get_pois(self, direction: float):
-        url = self.get_url(direction)
-        pois = set()
+    def get_pois(self):
+        url = self.get_url()
         http_timeout = 5
         response = requests.get(url, timeout=http_timeout)
         response.raise_for_status()
         data = response.json()
+        pois = set()
 
         # Durch die pois iterieren und das info-Feld als Dictionary parsen
         for poi in data['pois']:
@@ -97,10 +97,8 @@ class RadarWarningApi:
     def update_pois(self):
         LOGGER.debug("start poi update")
         self.last_update = None
-        all_pois = self.get_pois
-        for poi in all_pois:
+        for poi in self.get_pois:
             LOGGER.debug(poi)
 
         self.last_update = datetime.now(UTC)
-        self.pois = all_pois
         LOGGER.debug("end poi update")
