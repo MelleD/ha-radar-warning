@@ -1,5 +1,7 @@
+import asyncio
 import json
-import requests
+import socket
+import aiohttp
 import math
 from geopy.distance import geodesic
 from geopy.point import Point
@@ -53,6 +55,32 @@ class RadarWarningApi:
         url = self.get_url()
         pois = set()
         http_timeout = 5
+
+        try:
+            async with asyncio.timeout(self.request_timeout):
+                response = await self._session.request(
+                    method,
+                    url,
+                    auth=auth,
+                    data=data,
+                    json=json_data,
+                    params=params,
+                    headers=headers,
+                    ssl=self.verify_ssl,
+                    skip_auto_headers=skip_auto_headers,
+                )
+        except asyncio.TimeoutError as exception:
+            msg = "Timeout occurred while connecting to AdGuard Home instance."
+            raise AdGuardHomeConnectionError(msg) from exception
+        except (aiohttp.ClientError, socket.gaierror) as exception:
+            msg = "Error occurred while communicating with AdGuard Home."
+            raise AdGuardHomeConnectionError(msg) from exception
+
+
+
+
+
+
         response = requests.get(url, timeout=http_timeout)
         response.raise_for_status()
         data = response.json()
@@ -87,10 +115,6 @@ class RadarWarningApi:
         dost = (math.sin(math.radians(grad)) * abstand) / (1850 * math.cos(math.radians(self.latitude)))
         new_lat = self.latitude + dnord / 60
         new_lng = self.longitude + dost / 60
-        
-        print(f"Koordinaten berechnen Abstand: {abstand}")
-        print(f"Koordinaten berechnen Dnord Dost: {dnord} {dost}")
-        print(f"Koordinaten berechnen lat/lng: {new_lat} {new_lng}")
         
         return new_lat, new_lng
 

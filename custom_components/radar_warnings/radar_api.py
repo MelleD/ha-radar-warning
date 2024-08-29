@@ -1,13 +1,17 @@
 import json
-import requests
 import math
+import aiohttp
+import asyncio
+import socket
+
 from geopy.distance import geodesic
 from geopy.point import Point
 from datetime import UTC, datetime
 
-from .const import (
-    LOGGER
-)
+from .exceptions import RadarWarningConnectionError
+
+from .const import LOGGER
+
 
 class POI:
     def __init__(self, id, latitude, longitude, street, vmax, distance):
@@ -30,12 +34,18 @@ class POI:
                 f"Max Geschwindigkeit={self.vmax} km/h, Distanz={self.distance:.2f} km)")
 
 class RadarWarningApi:
-    def __init__(self,latitude: float, longitude: float, radius_km: float):
+    def __init__(self,latitude: float, longitude: float, radius_km: float, session: aiohttp.client.ClientSession | None = None):
         self.latitude = latitude
         self.longitude = longitude 
         self.radius_km = radius_km
         self.last_update = None
         self.pois = self.get_pois()
+        self._session = session
+        self._close_session = False
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+            self._close_session = True
+
 
     def __len__(self):
         """Return the count of pois."""
@@ -63,11 +73,27 @@ class RadarWarningApi:
 
         return f"https://cdn2.atudo.net/api/1.0/vl.php?type={get_type}&box={area_top_left_latitude},{area_top_left_longitude},{area_top_right_latitude},{area_top_right_longitude}"
 
-    def get_pois(self):
+    async def get_pois(self):
         url = self.get_url()
         http_timeout = 5
-        response = requests.get(url, timeout=http_timeout)
-        response.raise_for_status()
+
+        try:
+            async with asyncio.timeout(http_timeout):
+                response = await self._session.get(url)
+        except asyncio.TimeoutError as exception:
+            msg = "Timeout occurred while connecting to Radar warnings instance."
+            raise RadarWarningConnectionError(msg) from exception
+        except (aiohttp.ClientError, socket.gaierror) as exception:
+            msg = "Error occurred while communicating with Radar warnings instance."
+            raise RadarWarningConnectionError(msg) from exception
+        
+        if response.status // 100 in [4, 5]:
+            contents = await response.read()
+            response.close()
+            raise RadarWarningConnectionError(
+                response.status, json.loads(contents.decode("utf8"))
+            )
+
         data = response.json()
         pois = set()
 
