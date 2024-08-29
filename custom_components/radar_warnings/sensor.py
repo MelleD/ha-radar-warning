@@ -44,7 +44,7 @@ async def async_setup_entry(
 
     unique_id = entry.unique_id
     LOGGER.debug("unique_id %s", unique_id)
-    LOGGER.debug("config_name %s", entry.config_name)
+    LOGGER.debug("config_name %s", coordinator.config_name)
     assert unique_id
 
     async_add_entities(
