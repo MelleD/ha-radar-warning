@@ -45,7 +45,7 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                 {
                     vol.Required(
                         CONF_NAME, default=self.hass.config.location_name
-                    ): str,
+                    ): cv.string,
                     vol.Required(
                         CONF_LATITUDE, default=self.hass.config.latitude
                     ): cv.latitude,
@@ -53,11 +53,11 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                         CONF_LONGITUDE, default=self.hass.config.longitude
                     ): cv.longitude,
                      vol.Required(
-                         CONF_RADIUS, default=self.hass.config.radius
+                        CONF_RADIUS, default=self.hass.config.radius
                     ): cv.positive_float,
-                    vol.Optional(
-                         CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
-                    ): cv.time_period
+                    vol.Required(
+                        CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
+                    ): cv.positive_int
                 }
             ),
         )
