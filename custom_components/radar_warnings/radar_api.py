@@ -129,7 +129,7 @@ class RadarWarningApi:
         pois = await self.get_pois
         self.pois = pois;
         for poi in self.pois:
-            LOGGER.debug(poi)
+            LOGGER.warn(poi)
 
         await self.close()
         self.last_update = datetime.now(UTC)

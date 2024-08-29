@@ -7,6 +7,7 @@ from .radar_api import RadarWarningApi
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator
+from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from datetime import timedelta
 
@@ -46,11 +47,12 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
         self._radius = self.config_entry.data.get(CONF_RADIUS, 10.0)
         self.config_name = self.config_entry.data.get(CONF_NAME)
         self.update_interval = timedelta(minutes=self.config_entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
-        self.api = RadarWarningApi(self._latitude, self._longitude, self._radius)
+        session = async_get_clientsession(self.hass)
+        self.api = RadarWarningApi(self._latitude, self._longitude, self._radius, session)
 
         await self._async_update_data()
         await super().async_config_entry_first_refresh()
 
     async def _async_update_data(self) -> None:
         """Get the latest data from the Radar Warnings API."""
-        await self.hass.async_add_executor_job(self.api.update_pois)
+        await self.api.update_pois

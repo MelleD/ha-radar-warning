@@ -28,36 +28,39 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
         """Handle the initial step."""
         errors: dict = {}
 
-        if user_input is not None:
-            identifier = f"{user_input[CONF_NAME]}_{user_input[CONF_LATITUDE]}_{user_input[CONF_LONGITUDE]}"
-            # Set the unique ID for this config entry.
-            await self.async_set_unique_id(identifier)
-            self._abort_if_unique_id_configured()
-            return self.async_create_entry(
-                        title=user_input[CONF_NAME],
-                        data=user_input
-                    )
+        if user_input is None:
+            return self.async_show_form(
+                step_id="user",
+                errors=errors,
+                data_schema=vol.Schema(
+                    {
+                        vol.Required(
+                            CONF_NAME, default=self.hass.config.location_name
+                        ): cv.string,
+                        vol.Required(
+                            CONF_LATITUDE, default=self.hass.config.latitude
+                        ): cv.latitude,
+                        vol.Required(
+                            CONF_LONGITUDE, default=self.hass.config.longitude
+                        ): cv.longitude,
+                        vol.Required(
+                            CONF_RADIUS, default=self.hass.config.radius
+                        ): cv.positive_float,
+                        vol.Required(
+                            CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
+                        ): cv.positive_int
+                    }
+                ),
+            )
 
-        return self.async_show_form(
-            step_id="user",
-            errors=errors,
-            data_schema=vol.Schema(
-                {
-                    vol.Required(
-                        CONF_NAME, default=self.hass.config.location_name
-                    ): cv.string,
-                    vol.Required(
-                        CONF_LATITUDE, default=self.hass.config.latitude
-                    ): cv.latitude,
-                    vol.Required(
-                        CONF_LONGITUDE, default=self.hass.config.longitude
-                    ): cv.longitude,
-                     vol.Required(
-                        CONF_RADIUS, default=self.hass.config.radius
-                    ): cv.positive_float,
-                    vol.Required(
-                        CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
-                    ): cv.positive_int
-                }
-            ),
-        )
+        identifier = f"{user_input[CONF_NAME]}_{user_input[CONF_LATITUDE]}_{user_input[CONF_LONGITUDE]}"
+        # Set the unique ID for this config entry.
+        await self.async_set_unique_id(identifier)
+        self._abort_if_unique_id_configured()
+        return self.async_create_entry(
+                    title=user_input[CONF_NAME],
+                    data=user_input
+            )
+        
+
+
