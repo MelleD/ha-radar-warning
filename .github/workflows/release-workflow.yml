@@ -23,7 +23,9 @@ jobs:
       - name: Update version in manifest.json
         run: |
           cd ${{ github.workspace }}/custom_components/radar_warnings
-          jq '.version = "${{ github.event.inputs.release_version }}"' manifest.json > temp.json
+          release_version="${{ github.event.inputs.release_version }}"
+          echo "Debug: release_version is $release_version"
+          jq --arg version "$release_version" '.version = $version' manifest.json > temp.json
           mv temp.json manifest.json
 
       - name: Build
