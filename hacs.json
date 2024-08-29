@@ -1,5 +1,7 @@
 {
     "name": "Radar warning",
     "hacs": "2.0.0",
-    "homeassistant": "2024.8.0"
+    "homeassistant": "2024.8.0",
+    "zip_release": true,
+    "filename": "radar_warnings.zip"
   }
