@@ -21,6 +21,10 @@ from .const import (
     ATTR_WARNING_COUNT
 )
 
+from .const import (
+    LOGGER
+)
+
 from .coordinator import RadarWarningsConfigEntry,RadarWarningsCoordinator
 
 SENSOR_TYPE: SensorEntityDescription = (
@@ -39,6 +43,8 @@ async def async_setup_entry(
     coordinator = entry.runtime_data
 
     unique_id = entry.unique_id
+    LOGGER.debug("unique_id %s", unique_id)
+    LOGGER.debug("config_name %s", entry.config_name)
     assert unique_id
 
     async_add_entities(

@@ -20,7 +20,8 @@ from homeassistant.const import (
     CONF_RADIUS,
     CONF_LATITUDE, 
     CONF_LONGITUDE,
-    CONF_SCAN_INTERVAL
+    CONF_SCAN_INTERVAL,
+    CONF_NAME
 )
 
 
@@ -43,6 +44,7 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
         self._latitude = self.config_entry.data.get(CONF_LATITUDE, 0)
         self._longitude = self.config_entry.data.get(CONF_LONGITUDE, 0)
         self._radius = self.config_entry.data.get(CONF_RADIUS, 10.0)
+        self.config_name = self.config_entry.data.get(CONF_NAME)
         self.update_interval = timedelta(minutes=self.config_entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
         self.api = RadarWarningApi(self._latitude, self._longitude, self._radius)
 

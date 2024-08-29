@@ -5,10 +5,6 @@ from geopy.distance import geodesic
 from geopy.point import Point
 from datetime import UTC, datetime
 
-from .const import (
-    LOGGER
-)
-
 class POI:
     def __init__(self, id, latitude, longitude, street, vmax, distance):
         self.id = id
@@ -35,36 +31,26 @@ class RadarWarningApi:
         self.longitude = longitude 
         self.radius_km = radius_km
         self.last_update = None
-        self.pois = set()
+        self.pois = self.update_pois()
 
     def __len__(self):
         """Return the count of pois."""
         return len(self.pois)
 
-    def get_coordinates(self):
-        abstand = math.sqrt(self.radius_km*self.radius_km + self.radius_km*self.radius_km) * 1000  # Angabe in Meter!
-        
-        # Wegpunktprojektion berechnen
-        dnord = (math.cos(math.radians(grad)) * abstand) / 1850  # Ergebnis in Grad
-        dost = (math.sin(math.radians(grad)) * abstand) / (1850 * math.cos(math.radians(self.latitude)))
-        new_lat = self.latitude + dnord / 60
-        new_lng = self.longitude + dost / 60
-        
-        return new_lat, new_lng
-
-    def get_url(self, direction: float):
+    def get_url(self):
         get_type = "0,1,2,3,4,5,6"
-        area_top_right_coordinates = self.get_coordinates(45)
+        area_top_right_coordinates = self.blitzer_get_coordinates(45)
         area_top_right_latitude=area_top_right_coordinates[0]
         area_top_right_longitude=area_top_right_coordinates[1]
-        area_top_left_coordinates = self.get_coordinates(225)
+        area_top_left_coordinates = self.blitzer_get_coordinates(225)
         area_top_left_latitude=area_top_left_coordinates[0]
         area_top_left_longitude=area_top_left_coordinates[1]
 
         return f"https://cdn2.atudo.net/api/1.0/vl.php?type={get_type}&box={area_top_left_latitude},{area_top_left_longitude},{area_top_right_latitude},{area_top_right_longitude}"
 
-    def get_pois(self, direction: float):
-        url = self.get_url(direction)
+
+    def get_poi(self):
+        url = self.get_url()
         pois = set()
         http_timeout = 5
         response = requests.get(url, timeout=http_timeout)
@@ -92,15 +78,34 @@ class RadarWarningApi:
                 pois.add(poi)
 
         return pois
+    
+    def blitzer_get_coordinates(self, grad: int):
+        abstand = math.sqrt(self.radius_km*self.radius_km + self.radius_km*self.radius_km) * 1000  # Angabe in Meter!
+        
+        # Wegpunktprojektion berechnen
+        dnord = (math.cos(math.radians(grad)) * abstand) / 1850  # Ergebnis in Grad
+        dost = (math.sin(math.radians(grad)) * abstand) / (1850 * math.cos(math.radians(self.latitude)))
+        new_lat = self.latitude + dnord / 60
+        new_lng = self.longitude + dost / 60
+        
+        print(f"Koordinaten berechnen Abstand: {abstand}")
+        print(f"Koordinaten berechnen Dnord Dost: {dnord} {dost}")
+        print(f"Koordinaten berechnen lat/lng: {new_lat} {new_lng}")
+        
+        return new_lat, new_lng
 
 
     def update_pois(self):
-        LOGGER.debug("start poi update")
+        print("Start update_pois")
         self.last_update = None
-        all_pois = self.get_pois
+        all_pois = self.get_poi()
+
+        # Ausgabe der gesammelten POIs
         for poi in all_pois:
-            LOGGER.debug(poi)
+            print(poi)
 
         self.last_update = datetime.now(UTC)
         self.pois = all_pois
-        LOGGER.debug("end poi update")
+
+api = RadarWarningApi(48.644854635295175,8.895243108272554,20)
+#api = RadarWarningApi(52.288659,13.411855,20)
