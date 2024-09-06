@@ -1,7 +1,16 @@
 {
-    "config": {
-      "step": {
-        "user": {
+  "config": {
+    "step": {
+      "user": {
+        "description": "To identify the desired zone, the zone entity is required. The provided zone has to contain the attributes 'latitude' and 'longitude'.",
+        "data": {
+          "latitude": "[%key:common::config_flow::data::latitude%]",
+          "longitude": "[%key:common::config_flow::data::longitude%]",
+          "radius": "[%key:common::config_flow::data::radius%]",
+          "name": "[%key:common::config_flow::data::name%]",
+          "scan_interval": "Scan interval in minutes"
+        },
+        "init": {
           "description": "To identify the desired zone, the zone entity is required. The provided zone has to contain the attributes 'latitude' and 'longitude'.",
           "data": {
             "latitude": "[%key:common::config_flow::data::latitude%]",
@@ -10,22 +19,22 @@
             "name": "[%key:common::config_flow::data::name%]",
             "scan_interval": "Scan interval in minutes"
           }
-        }
       }
-    },
-    "entity": {
-      "sensor": {
-        "radar_warning": {
-          "name": "Radar warning count",
-          "state_attributes": {
-            "last_update": {
-              "name": "Last update"
-            },
-            "warning_count": {
-              "name": "Warning count"
-            }
+    }
+  },
+  "entity": {
+    "sensor": {
+      "radar_warning": {
+        "name": "Radar warning count",
+        "state_attributes": {
+          "last_update": {
+            "name": "Last update"
+          },
+          "warning_count": {
+            "name": "Warning count"
           }
         }
       }
     }
   }
+}
