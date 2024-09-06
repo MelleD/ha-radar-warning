@@ -27,11 +27,19 @@ class POI:
 
     def __hash__(self):
         return hash(self.id)
+    
+    def to_json(self):
+        return {
+            "id": self.id,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "street": self.street,
+            "vmax": self.vmax,
+            "distance": self.distance
+        }
 
     def __repr__(self):
-        return (f"POI(ID={self.id}, Straße={self.street}, "
-                f"Koordinaten=({self.latitude},{self.longitude}), "
-                f"Max Geschwindigkeit={self.vmax} km/h, Distanz={self.distance:.2f} km)")
+        return f"{self.to_json()}"
 
 class RadarWarningApi:
     def __init__(self,latitude: float, longitude: float, radius_km: float, session: aiohttp.client.ClientSession | None = None):
@@ -94,7 +102,7 @@ class RadarWarningApi:
             )
 
         data = await response.json()
-        pois = set()
+        pois = list()
 
         # Durch die pois iterieren und das info-Feld als Dictionary parsen
         for poi in data['pois']:
@@ -113,8 +121,8 @@ class RadarWarningApi:
                     street=poi_data['street'],
                     vmax=poi_data['vmax'],
                     distance=distance
-                )
-                pois.add(poi)
+                ).to_json()
+                pois.append(poi)
 
         return pois
 
@@ -133,4 +141,3 @@ class RadarWarningApi:
 
         await self.close()
         self.last_update = datetime.now(UTC)
-        LOGGER.debug("end poi update")

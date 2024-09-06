@@ -23,12 +23,20 @@ class POI:
 
     def __hash__(self):
         return hash(self.id)
+    
+    def to_json(self):
+        return {
+            "id": self.id,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "street": self.street,
+            "vmax": self.vmax,
+            "distance": self.distance
+        }
 
     def __repr__(self):
-        return (f"POI(ID={self.id}, Straße={self.street}, "
-                f"Koordinaten=({self.latitude},{self.longitude}), "
-                f"Max Geschwindigkeit={self.vmax} km/h, Distanz={self.distance:.2f} km)")
-
+        return f"{self.to_json()}"
+    
 class RadarWarningApi:
     def __init__(self,latitude: float, longitude: float, radius_km: float, session: aiohttp.client.ClientSession | None = None):
         self.latitude = latitude
@@ -37,7 +45,7 @@ class RadarWarningApi:
         self.last_update = None
         self._session = session
         self._close_session = False
-        self.pois = set()
+        self.pois = list()
 
     def __len__(self):
         """Return the count of pois."""
@@ -91,7 +99,7 @@ class RadarWarningApi:
             )
 
         data = await response.json()
-        pois = set()
+        pois = list()
 
         # Durch die pois iterieren und das info-Feld als Dictionary parsen
         for poi in data['pois']:
@@ -110,8 +118,8 @@ class RadarWarningApi:
                     street=poi_data['street'],
                     vmax=poi_data['vmax'],
                     distance=distance
-                )
-                pois.add(poi)
+                ).to_json()
+                pois.append(poi)
 
         return pois
     
@@ -119,7 +127,6 @@ class RadarWarningApi:
         """Close open client session."""
         print("Close Session")
         if self._session and self._close_session:
-            print("Close Session 1")
             await self._session.close()
 
 
@@ -132,6 +139,10 @@ class RadarWarningApi:
        
         self.last_update = datetime.now(UTC)
         await self.close()
+        try:
+            json.dumps(self.pois)
+        except TypeError as e:
+            print(f"Serialization error: {e}")
         print("end poi update")
 
 async def main():

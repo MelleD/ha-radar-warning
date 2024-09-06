@@ -53,7 +53,7 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                 ),
             )
 
-        identifier = f"{user_input[CONF_NAME]}_{user_input[CONF_LATITUDE]}_{user_input[CONF_LONGITUDE]}"
+        identifier = f"{user_input[CONF_NAME]}"
         # Set the unique ID for this config entry.
         await self.async_set_unique_id(identifier)
         self._abort_if_unique_id_configured()
