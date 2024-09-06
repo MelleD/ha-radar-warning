@@ -55,5 +55,4 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
 
     async def _async_update_data(self) -> None:
         """Get the latest data from the Radar Warnings API."""
-        # self.api.update_pois()
         await self.api.update_pois()

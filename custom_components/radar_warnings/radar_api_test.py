@@ -137,7 +137,7 @@ class RadarWarningApi:
 async def main():
     api = RadarWarningApi(48.644854635295175,8.895243108272554,20)
     #api = RadarWarningApi(52.288659,13.411855,20)
-    await api.update_pois()  # Korrekt: 'await' verwenden, um die coroutine auszuführen
+    await api.update_pois()
 
 # Starte das Hauptprogramm asynchron
 asyncio.run(main())

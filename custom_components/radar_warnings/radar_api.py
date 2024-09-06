@@ -93,7 +93,7 @@ class RadarWarningApi:
                 response.status, json.loads(contents.decode("utf8"))
             )
 
-        data = response.json()
+        data = await response.json()
         pois = set()
 
         # Durch die pois iterieren und das info-Feld als Dictionary parsen
