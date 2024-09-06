@@ -12,7 +12,8 @@
           "longitude": "[%key:common::config_flow::data::longitude%]",
           "radius": "[%key:common::config_flow::data::radius%]",
           "name": "[%key:common::config_flow::data::name%]",
-          "scan_interval": "Scan interval in minutes"
+          "scan_interval": "Scan interval in minutes",
+          "show_on_map": "Show stations on map"
         },
         "init": {
           "description": "To identify the desired zone, the zone entity is required. The provided zone has to contain the attributes 'latitude' and 'longitude'.",
@@ -22,7 +23,8 @@
             "longitude": "[%key:common::config_flow::data::longitude%]",
             "radius": "[%key:common::config_flow::data::radius%]",
             "name": "[%key:common::config_flow::data::name%]",
-            "scan_interval": "Scan interval in minutes"
+            "scan_interval": "Scan interval in minutes",
+            "show_on_map": "Show stations on map"
           }
        }
       }
