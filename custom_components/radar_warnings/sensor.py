@@ -60,7 +60,6 @@ class RadarWarningsSensor(
     """Representation of a Radar Warnings sensor."""
 
     _attr_attribution = "Data provided by Radar warnings"
-    _attr_has_entity_name = True
 
     def __init__(
         self,
@@ -71,7 +70,7 @@ class RadarWarningsSensor(
         """Initialize a Radar Warnings sensor."""
         super().__init__(coordinator)
         self.entity_description = description
-        self._attr_unique_id = f"{unique_id}-{description.key}"
+        self._attr_unique_id = unique_id
         self._attr_device_info = DeviceInfo(
             identifiers={(DOMAIN, unique_id)},
             name="Radar Warnings",

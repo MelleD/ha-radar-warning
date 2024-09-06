@@ -24,6 +24,7 @@
             "name": "[%key:common::config_flow::data::name%]",
             "scan_interval": "Scan interval in minutes"
           }
+       }
       }
     }
   },
