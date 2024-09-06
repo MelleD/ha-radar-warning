@@ -35,8 +35,7 @@ The Radar integeration is not available in [HACS][hacs] (Home Assistant Communit
 ## Known issue
 
 a) No marker on the standard map
-b) Sensor name includes none. No idea why expected config name
-c) config flow show no description for input strings
+b) config flow show no description for input strings
 
 ## Support
 
