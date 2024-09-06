@@ -16,8 +16,10 @@ DOMAIN: Final = "radar_warnings"
 ATTR_LAST_UPDATE: Final = "last_update"
 ATTR_WARNING_COUNT: Final = "warning_count"
 
+API_ATTR_WARNING_ID="id"
 API_ATTR_WARNING_STREET: Final = "street"
 API_ATTR_WARNING_VMAX: Final = "vmax"
+API_ATTR_WARNING_DISTANCE="distance"
 
 DEFAULT_NAME: Final = "Radar Warnings"
 

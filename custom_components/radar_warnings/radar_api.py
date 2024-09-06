@@ -10,7 +10,8 @@ from datetime import UTC, datetime
 
 from .exceptions import RadarWarningConnectionError
 
-from .const import LOGGER
+from .const import LOGGER, API_ATTR_WARNING_ID, API_ATTR_WARNING_DISTANCE, API_ATTR_WARNING_STREET, API_ATTR_WARNING_VMAX
+from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
 
 
 class POI:
@@ -30,18 +31,19 @@ class POI:
     
     def to_json(self):
         return {
-            "id": self.id,
-            "latitude": self.latitude,
-            "longitude": self.longitude,
-            "street": self.street,
-            "vmax": self.vmax,
-            "distance": self.distance
+            API_ATTR_WARNING_ID: self.id,
+            ATTR_LATITUDE: self.latitude,
+            ATTR_LONGITUDE: self.longitude,
+            API_ATTR_WARNING_STREET: self.street,
+            API_ATTR_WARNING_VMAX: self.vmax,
+            API_ATTR_WARNING_DISTANCE: self.distance
         }
 
     def __repr__(self):
         return f"{self.to_json()}"
 
 class RadarWarningApi:
+
     def __init__(self,latitude: float, longitude: float, radius_km: float, session: aiohttp.client.ClientSession | None = None):
         self.latitude = latitude
         self.longitude = longitude 
@@ -137,7 +139,7 @@ class RadarWarningApi:
         pois = await self.get_pois()
         self.pois = pois
         for poi in self.pois:
-            LOGGER.warn(poi)
+            LOGGER.debug(poi)
 
         await self.close()
         self.last_update = datetime.now(UTC)

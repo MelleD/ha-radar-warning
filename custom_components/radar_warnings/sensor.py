@@ -14,16 +14,20 @@ from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 
+from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
+
 from .const import (
     RADAR_WARNING_SENSOR,
     DOMAIN,
     ATTR_LAST_UPDATE,
-    ATTR_WARNING_COUNT
-)
-
-from .const import (
+    ATTR_WARNING_COUNT,
+    API_ATTR_WARNING_ID, 
+    API_ATTR_WARNING_DISTANCE, 
+    API_ATTR_WARNING_STREET, 
+    API_ATTR_WARNING_VMAX,
     LOGGER
 )
+
 
 from .coordinator import RadarWarningsConfigEntry,RadarWarningsCoordinator
 
@@ -90,12 +94,14 @@ class RadarWarningsSensor(
         }
 
         pois = self.coordinator.api.pois
-
+        LOGGER.warn(pois)
         for i, poi in enumerate(pois, 1):
-            data[f"warning_{i}_latitude"] = poi.latitude
-            data[f"warning_{i}_longitude"] = poi.longitude
-            data[f"warning_{i}_street"] = poi.street
-            data[f"warning_{i}_vmax"] = poi.vmax
+            data[f"warning_{i}id"] = poi[API_ATTR_WARNING_ID]
+            data[f"warning_{i}_latitude"] = poi[ATTR_LATITUDE]
+            data[f"warning_{i}_longitude"] = poi[ATTR_LONGITUDE]
+            data[f"warning_{i}_street"] = poi[API_ATTR_WARNING_STREET]
+            data[f"warning_{i}_vmax"] = poi[API_ATTR_WARNING_VMAX]
+            data[f"warning_{i}_distance"] = poi[API_ATTR_WARNING_DISTANCE]
 
             # Dictionary for the attribute containing the complete warning.
             warning_copy = pois.copy()
