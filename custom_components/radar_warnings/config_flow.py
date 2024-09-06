@@ -13,7 +13,8 @@ from .const import DOMAIN, DEFAULT_SCAN_INTERVAL
 from homeassistant.const import (
     CONF_NAME,
     CONF_RADIUS,
-    CONF_SCAN_INTERVAL
+    CONF_SCAN_INTERVAL,
+    CONF_SHOW_ON_MAP
 )
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
 
@@ -48,7 +49,10 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                         ): cv.positive_float,
                         vol.Required(
                             CONF_SCAN_INTERVAL, default=DEFAULT_SCAN_INTERVAL
-                        ): cv.positive_int
+                        ): cv.positive_int,
+                        vol.Required(
+                            CONF_SHOW_ON_MAP, default=True
+                        ): cv.boolean
                     }
                 ),
             )

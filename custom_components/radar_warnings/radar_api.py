@@ -133,7 +133,7 @@ class RadarWarningApi:
             await self._session.close()
 
     async def update_pois(self):
-        LOGGER.warn("start poi update")
+        LOGGER.debug("start poi update")
         self.last_update = None
         pois = await self.get_pois()
         self.pois = pois
