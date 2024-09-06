@@ -1,5 +1,9 @@
 {
+  "title": "Radar warnings",
   "config": {
+    "abort": {
+      "already_configured": "Config is already exist"
+    },
     "step": {
       "user": {
         "description": "To identify the desired zone, the zone entity is required. The provided zone has to contain the attributes 'latitude' and 'longitude'.",
@@ -12,6 +16,7 @@
         },
         "init": {
           "description": "To identify the desired zone, the zone entity is required. The provided zone has to contain the attributes 'latitude' and 'longitude'.",
+          "title": "Radar warnings",
           "data": {
             "latitude": "[%key:common::config_flow::data::latitude%]",
             "longitude": "[%key:common::config_flow::data::longitude%]",
