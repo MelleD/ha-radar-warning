@@ -15,7 +15,7 @@ Radar warning integration for HomeAssistant
 I give no guarantee for the functionality and no promise of lifelong maintenance, as I do the whole thing in my free time. Of course, I am happy about every contribution and PR
 
 
-This integration displays speed camera/radar warnings from a zone entity in a specified radius (km).
+This integration displays speed camera/radar warnings from latitude and longitute in a specified radius (km).
 A sensor is currently being created which contains all POIs. 
 
 The plan is to display this on the standard HA map at some point.
@@ -32,6 +32,11 @@ The Radar integeration is not available in [HACS][hacs] (Home Assistant Communit
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=MelleD&repository=ha-radar-warning&category=plugin)
 
+## Known issue
+
+a) No marker on the standard app
+b) Sensor name includes none. No idea why
+c) config flow show no description for input strings
 
 ## Support
 

@@ -115,7 +115,7 @@ class RadarWarningApi:
                     id=poi_data['id'],
                     latitude=poi_data['lat'],
                     longitude=poi_data['lng'],
-                    street=poi_data['street'],
+                    street=poi_data.get('street', ""),
                     vmax=poi_data['vmax'],
                     distance=distance
                 ).to_json()

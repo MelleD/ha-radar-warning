@@ -47,8 +47,6 @@ async def async_setup_entry(
     coordinator = entry.runtime_data
 
     unique_id = entry.unique_id
-    LOGGER.warn("unique_id %s", unique_id)
-    LOGGER.warn("config_name %s", coordinator.config_name)
     assert unique_id
 
     async_add_entities(
@@ -94,18 +92,14 @@ class RadarWarningsSensor(
         }
 
         pois = self.coordinator.api.pois
-        LOGGER.warn(pois)
+        data[f"warnings"] = pois.copy()
         for i, poi in enumerate(pois, 1):
-            data[f"warning_{i}id"] = poi[API_ATTR_WARNING_ID]
+            data[f"warning_{i}_id"] = poi[API_ATTR_WARNING_ID]
             data[f"warning_{i}_latitude"] = poi[ATTR_LATITUDE]
             data[f"warning_{i}_longitude"] = poi[ATTR_LONGITUDE]
             data[f"warning_{i}_street"] = poi[API_ATTR_WARNING_STREET]
             data[f"warning_{i}_vmax"] = poi[API_ATTR_WARNING_VMAX]
             data[f"warning_{i}_distance"] = poi[API_ATTR_WARNING_DISTANCE]
-
-            # Dictionary for the attribute containing the complete warning.
-            warning_copy = pois.copy()
-            data[f"warning_{i}"] = warning_copy
 
         return data
 
