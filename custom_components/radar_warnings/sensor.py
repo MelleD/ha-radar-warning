@@ -50,11 +50,6 @@ async def async_setup_entry(
     unique_id = entry.unique_id
     assert unique_id
 
-    pois = coordinator.api.pois  
-    for i, poi in enumerate(pois, 1):
-        unique_id_radar = f"{unique_id}_{i}"
-        RadarMapWarningsSensor(coordinator, SENSOR_TYPE, unique_id_radar,poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE],poi[API_ATTR_WARNING_VMAX])
-
     async_add_entities(
         [RadarWarningsSensor(coordinator, SENSOR_TYPE, unique_id)]
     )
