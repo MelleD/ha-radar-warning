@@ -10,18 +10,21 @@ from datetime import UTC, datetime
 
 from .exceptions import RadarWarningConnectionError
 
-from .const import LOGGER, API_ATTR_WARNING_ID, API_ATTR_WARNING_DISTANCE, API_ATTR_WARNING_STREET, API_ATTR_WARNING_VMAX
+from .const import LOGGER, API_ATTR_WARNING_ID, API_ATTR_WARNING_DISTANCE, API_ATTR_WARNING_STREET, API_ATTR_WARNING_VMAX, API_ATTR_WARNING_ADRESS, API_ATTR_WARNING_ADRESS_SHORT
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
 
 
 class POI:
-    def __init__(self, id, latitude, longitude, street, vmax, distance):
+    def __init__(self, id, latitude, longitude, street, vmax, distance, adress: str | None = None, adress_short: str | None = None):
         self.id = id
         self.latitude = float(latitude)
         self.longitude = float(longitude)
         self.street = street
         self.vmax = vmax
         self.distance = distance
+        self.adress = adress
+        self.adress_short= None
+        self.adress_short= adress_short
 
     def __eq__(self, other):
         return self.id == other.id
@@ -36,7 +39,9 @@ class POI:
             ATTR_LONGITUDE: self.longitude,
             API_ATTR_WARNING_STREET: self.street,
             API_ATTR_WARNING_VMAX: self.vmax,
-            API_ATTR_WARNING_DISTANCE: self.distance
+            API_ATTR_WARNING_DISTANCE: self.distance,
+            API_ATTR_WARNING_ADRESS: self.adress,
+            API_ATTR_WARNING_ADRESS_SHORT: self.adress_short
         }
 
     def __repr__(self):
@@ -44,15 +49,15 @@ class POI:
 
 class RadarWarningApi:
 
-    def __init__(self,latitude: float, longitude: float, radius_km: float, session: aiohttp.client.ClientSession | None = None):
+    def __init__(self,latitude: float, longitude: float, radius_km: float, session: aiohttp.client.ClientSession | None = None, google_api_key: str | None = None):
         self.latitude = latitude
         self.longitude = longitude 
         self.radius_km = radius_km
         self.last_update = None
         self._session = session
         self._close_session = False
-
-
+        self.google_api_key = google_api_key
+        
     def __len__(self):
         """Return the count of pois."""
         return len(self.pois)
@@ -78,6 +83,56 @@ class RadarWarningApi:
         area_top_left_longitude=area_top_left_coordinates[1]
 
         return f"https://cdn2.atudo.net/api/1.0/vl.php?type={get_type}&box={area_top_left_latitude},{area_top_left_longitude},{area_top_right_latitude},{area_top_right_longitude}"
+    
+    def get_google_url(self, point: Point):
+        return f"https://maps.googleapis.com/maps/api/geocode/json?latlng={point.latitude},{point.longitude}&key={self.google_api_key}"
+
+    async def get_adress(self, point: Point) -> str :
+        if self.google_api_key is None:
+            return (None, None)
+    
+        url = self.get_google_url(point)
+        http_timeout = 10
+        if self._session is None:
+            self._session = aiohttp.ClientSession()
+            self._close_session = True
+        
+        try:
+            async with asyncio.timeout(http_timeout):
+                response = await self._session.get(url)
+        except asyncio.TimeoutError as exception:
+            msg = "Timeout occurred while connecting to Radar warnings instance."
+            raise RadarWarningConnectionError(msg) from exception
+        except (aiohttp.ClientError, socket.gaierror) as exception:
+            msg = "Error occurred while communicating with Radar warnings instance."
+            raise RadarWarningConnectionError(msg) from exception
+        
+        if response.status // 100 in [4, 5]:
+            contents = await response.read()
+            response.close()
+            raise RadarWarningConnectionError(
+                response.status, json.loads(contents.decode("utf8"))
+            )
+
+        data_adress = await response.json()
+        first_result = data_adress['results'][0]
+        formatted_address = first_result['formatted_address']
+        address_components = first_result['address_components']
+        
+        address_parts = []
+        for component in address_components:
+            if 'locality' in component['types']:
+                address_parts.append(component['long_name'])
+
+            if 'route' in component['types']:
+                address_parts.append(component['long_name'])
+        
+        # Die Adresse ohne Land zurückgeben
+        adress_short =  ', '.join(address_parts)
+
+
+
+        return (formatted_address,adress_short)
 
     async def get_pois(self):
         url = self.get_url()
@@ -103,18 +158,19 @@ class RadarWarningApi:
                 response.status, json.loads(contents.decode("utf8"))
             )
 
-        data = await response.json()
+        data_pois = await response.json()
         pois = list()
 
         # Durch die pois iterieren und das info-Feld als Dictionary parsen
-        for poi in data['pois']:
+        for poi in data_pois['pois']:
             poi['info'] = json.loads(poi['info'])
 
         # Datenstruktur ausgeben
-        for poi_data in data['pois']:
+        for poi_data in data_pois['pois']:
             start_point = Point(self.latitude, self.longitude)
             end_point = Point(poi_data['lat'], poi_data['lng'])
             distance = geodesic(start_point, end_point).kilometers
+            adress, adress_short = self.get_adress(end_point)
             if distance <= self.radius_km:
                 poi = POI(
                     id=poi_data['id'],
@@ -122,7 +178,9 @@ class RadarWarningApi:
                     longitude=poi_data['lng'],
                     street=poi_data.get('street', ""),
                     vmax=poi_data['vmax'],
-                    distance=distance
+                    distance=distance,
+                    adress=adress,
+                    adress_short = adress_short
                 ).to_json()
                 pois.append(poi)
         return pois

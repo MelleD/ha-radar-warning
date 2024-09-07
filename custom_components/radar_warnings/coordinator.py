@@ -22,7 +22,10 @@ from homeassistant.const import (
     CONF_LATITUDE, 
     CONF_LONGITUDE,
     CONF_SCAN_INTERVAL,
-    CONF_NAME
+    CONF_NAME,
+    CONF_API_KEY,
+    CONF_SHOW_ON_MAP
+    
 )
 
 
@@ -46,10 +49,11 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
         self._longitude = self.config_entry.data.get(CONF_LONGITUDE, 0)
         self._radius = self.config_entry.data.get(CONF_RADIUS, 10.0)
         self.config_name = self.config_entry.data.get(CONF_NAME)
-        self.show_map = self.config_entry.data.get(CONF_NAME)
+        self.show_map = self.config_entry.data.get(CONF_SHOW_ON_MAP)
+        self.google_api_key = self.config_entry.data.get(CONF_API_KEY)
         self.update_interval = timedelta(minutes=self.config_entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
         session = async_get_clientsession(self.hass)
-        self.api = RadarWarningApi(self._latitude, self._longitude, self._radius, session)
+        self.api = RadarWarningApi(self._latitude, self._longitude, self._radius, session, google_api_key)
 
         await self._async_update_data()
         await super().async_config_entry_first_refresh()

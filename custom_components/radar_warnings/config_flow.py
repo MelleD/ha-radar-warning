@@ -14,7 +14,8 @@ from homeassistant.const import (
     CONF_NAME,
     CONF_RADIUS,
     CONF_SCAN_INTERVAL,
-    CONF_SHOW_ON_MAP
+    CONF_SHOW_ON_MAP,
+    CONF_API_KEY
 )
 from homeassistant.const import CONF_LATITUDE, CONF_LONGITUDE
 
@@ -52,6 +53,9 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                         ): cv.positive_int,
                         vol.Required(
                             CONF_SHOW_ON_MAP, default=True
+                        ): cv.boolean,
+                        vol.Optional(
+                            CONF_API_KEY, default=None
                         ): cv.boolean
                     }
                 ),

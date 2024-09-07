@@ -98,12 +98,12 @@ class MapManager:
             self._hass.add_job(device.async_remove())
 
         pois = self._coordinator.api.pois
-        new_devices = []
         for i, poi in enumerate(pois, 1):
             unique_id_radar = f"{self._unique_id}_{i}"
+            LOGGER.warn("New device: %s", unique_id_radar)
             new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
             self._managed_devices.append(new_device)    
-        self._add_entities(new_devices)
+        self._add_entities(self._managed_devices)
 
 
 class RadarWarningsSensor(
