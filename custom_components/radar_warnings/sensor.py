@@ -15,7 +15,8 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.const import UnitOfLength
 from homeassistant.components.geo_location import GeolocationEvent
-from homeassistant.helpers.event import track_time_interval
+from homeassistant.helpers.event import async_track_time_interval
+from homeassistant.helpers import device_registry as dr
 
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
 
@@ -70,16 +71,28 @@ class MapManager:
 
     def _init_regular_updates(self) -> None:
         """Schedule regular updates based on configured time interval."""
-        track_time_interval(
+        async_track_time_interval(
             self._hass,
             lambda now: self._update(),
             self._coordinator.update_interval,
             cancel_on_shutdown=True,
         )
 
+    def _remove_entity(self) -> None:
+        device_reg = dr.async_get(self._hass)
+        max_iterations=1000
+        for i in range(max_iterations):
+            unique_id_radar = f"{self._unique_id}_{i}"
+            device = device_reg.async_get_device({(DOMAIN, unique_id_radar)})
+            LOGGER.warn("Found device: %d", device)
+            if device is None:
+                return
+            self._hass.add_job(device.async_remove())
+
     def _update(self) -> None:
         """Update Map entry."""
-        LOGGER.warn("Update Map entry")
+        LOGGER.warn("Update Map entry, devices to update: %d", len(self._managed_devices))
+
         for device in list(self._managed_devices):
             self._managed_devices.remove(device)
             self._hass.add_job(device.async_remove())
