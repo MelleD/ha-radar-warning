@@ -53,7 +53,7 @@ class RadarWarningsCoordinator(DataUpdateCoordinator[None]):
         self.google_api_key = self.config_entry.data.get(CONF_API_KEY)
         self.update_interval = timedelta(minutes=self.config_entry.data.get(CONF_SCAN_INTERVAL, DEFAULT_SCAN_INTERVAL))
         session = async_get_clientsession(self.hass)
-        self.api = RadarWarningApi(self._latitude, self._longitude, self._radius, session, google_api_key)
+        self.api = RadarWarningApi(self._latitude, self._longitude, self._radius, session, self.google_api_key)
 
         await self._async_update_data()
         await super().async_config_entry_first_refresh()
