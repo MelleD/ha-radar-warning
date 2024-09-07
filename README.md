@@ -32,6 +32,47 @@ The Radar integeration is not available in [HACS][hacs] (Home Assistant Communit
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=MelleD&repository=ha-radar-warning&category=plugin)
 
+## Google Geolocation API Setup
+
+The Google Geolocation API allows you to determine and process location data. This is optional and improves the adress data for the POIs. This guide outlines the steps to set up and use the Google Geolocation API.
+
+### Prerequisites
+- A Google Cloud account
+- A Google Cloud project
+- Access to the Google Cloud Console
+
+### Step-by-Step Guide
+#### 1. Create a Google Cloud Project
+- Go to the Google Cloud Console.
+- Click on the project dropdown menu at the top of the page and select "New Project".
+- Enter a project name and billing account (if prompted), then click "Create".
+- Make a note of your Project ID, as you'll need it later.
+
+#### 2. Enable the Geolocation API
+- In the Google Cloud Console, navigate to the "API & Services" section.
+- Click on "Library" to view available APIs.
+- Search for "Geolocation API" in the search bar.
+- Click on "Geolocation API" and then click "Enable".
+
+#### 3. Set Up Billing
+Google Cloud requires billing information to use most of its APIs.
+
+- In the Google Cloud Console, go to the "Billing" section.
+- Link your project to a billing account if you haven't already done so.
+#### Create API Credentials
+- In the Google Cloud Console, go to the "API & Services" > "Credentials" section.
+- Click on "Create Credentials" and select "API Key".
+- Copy the API key that is generated. You will need this key to authenticate your API requests and copy it to the config in HA.
+
+#### ‼️ Danger ‼️
+You can (currently) make 40.000 request per month for free. After that you have to pay for the request, but you can restrict your API key and setup alerting
+
+#### Monitoring and Quota Management
+- In the Google Cloud Console, navigate to "API & Services" > "Dashboard".
+- Here you can monitor your API usage and set up alerts if needed.
+- To manage quotas, go to "API & Services" > "Quotas" and adjust your settings as necessary. e.g. 1250 request per day
+
+
 ## Known issue
 
 a) No marker on the standard map
