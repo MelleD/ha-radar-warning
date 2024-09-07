@@ -80,32 +80,44 @@ class MapManager:
 
     def _remove_entity(self) -> None:
         device_reg = dr.async_get(self._hass)
+        LOGGER.warn("Remove device1:")
+        device1 = device_reg.async_get_device("zoo_1")
+        self._hass.add_job(device1.async_remove())
+        device2 = device_reg.async_get_device("zoo_2")
+        self._hass.add_job(device2.async_remove())
+        LOGGER.warn("Removed devices:")
         max_iterations=1000
-        for i in range(max_iterations):
-            unique_id_radar = f"{self._unique_id}_{i}"
-            device = device_reg.async_get_device({(DOMAIN, unique_id_radar)})
-            LOGGER.warn("Found device: %d", device)
+        for i in range(1,max_iterations):
+            unique_id_radar = self._radar_map_name(i)
+            LOGGER.warn("Remove device: %s", unique_id_radar)
+            device = device_reg.async_get_device(unique_id_radar)
+            LOGGER.warn("Remove Found device: %s", device)
             if device is None:
                 return
             self._hass.add_job(device.async_remove())
 
-    def _update(self) -> None:
+    async def _update(self) -> None:
         """Update Map entry."""
         LOGGER.warn("Update Map entry, devices to update: %d", len(self._managed_devices))
+        self._remove_entity()
 
-        for device in list(self._managed_devices):
-            LOGGER.warn("Remove device")
-            self._managed_devices.remove(device)
-            self._hass.add_job(device.async_remove())
+        #for device in list(self._managed_devices):
+        #    LOGGER.warn("Remove device 2")
+        #    self._managed_devices.remove(device)
+        #    self._hass.add_job(device.async_remove())
 
         pois = self._coordinator.api.pois
         for i, poi in enumerate(pois, 1):
-            unique_id_radar = f"{self._unique_id}_{i}"
+            unique_id_radar = self._radar_map_name(i)
             LOGGER.warn("New device: %s", unique_id_radar)
             new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
             self._managed_devices.append(new_device)    
-        self._add_entities(self._managed_devices)
+        await self._add_entities(self._managed_devices)
         LOGGER.warn("Added New device")
+    
+    def _radar_map_name(self, count: int) -> str:
+         """Radar Map Sensor name."""
+         return f"{DOMAIN}_{self._unique_id}_{count}"
 
 
 class RadarWarningsSensor(
@@ -168,7 +180,7 @@ class RadarMapWarningsSensor(GeolocationEvent):
         longitude: float
     ) -> None:
         """Initialize entity with data provided."""
-        self._attr_name = f"{DOMAIN}_{name}"
+        self._attr_name = name
         self._attr_icon = "mdi:cctv"
         self._distance = distance
         self._latitude = latitude

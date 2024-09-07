@@ -13,8 +13,8 @@
           "radius": "[%key:common::config_flow::data::radius%]",
           "name": "[%key:common::config_flow::data::name%]",
           "api_key": "[%key:common::config_flow::data::api_key%]",
-          "scan_interval": "[%key:common::config_flow::data::scan%]",
-          "show_on_map": "[%key:common::config_flow::data::map%]"
+          "scan_interval": "[%key:common::config_flow::data::scan_interval%]",
+          "show_on_map": "[%key:common::config_flow::data::show_on_map%]"
         }
       }
     }

@@ -11,8 +11,8 @@
             "longitude": "Longitude",
             "name": "Name",
             "radius": "Radius (km)",
-            "scan": "Scan intervall (minutes)",
-            "map": "Show POIs in map"
+            "scan_interval": "Scan intervall (minutes)",
+            "show_on_map": "Show POIs in map"
           },
           "description": "Fill in the data of your zone. The optional Api Key is used for the google GeoLocation Api"
         }

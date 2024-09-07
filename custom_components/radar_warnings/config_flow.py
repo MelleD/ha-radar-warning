@@ -55,7 +55,7 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                             CONF_SHOW_ON_MAP, default=True
                         ): cv.boolean,
                         vol.Optional(
-                            CONF_API_KEY, default=None
+                            CONF_API_KEY
                         ): cv.string
                     }
                 ),
