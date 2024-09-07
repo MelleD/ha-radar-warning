@@ -59,24 +59,21 @@ Google Cloud requires billing information to use most of its APIs.
 
 - In the Google Cloud Console, go to the "Billing" section.
 - Link your project to a billing account if you haven't already done so.
-#### Create API Credentials
+#### 4. Create API Credentials
 - In the Google Cloud Console, go to the "API & Services" > "Credentials" section.
 - Click on "Create Credentials" and select "API Key".
 - Copy the API key that is generated. You will need this key to authenticate your API requests and copy it to the config in HA.
 
 #### ‼️ Danger ‼️
-You can (currently) make 40.000 request per month for free. After that you have to pay for the request, but you can restrict your API key and setup alerting
-
-#### Monitoring and Quota Management
+You can (currently) make 40.000 request per month for free. After that you have to pay for the request, but you can restrict your API key and setup alerting:
 - In the Google Cloud Console, navigate to "API & Services" > "Dashboard".
 - Here you can monitor your API usage and set up alerts if needed.
 - To manage quotas, go to "API & Services" > "Quotas" and adjust your settings as necessary. e.g. 1250 request per day
 
 
 ## Known issue
-
-a) No marker on the standard map
-b) config flow show no description for input strings
+- No marker on the standard map
+- config flow show no description for input strings
 
 ## Support
 
