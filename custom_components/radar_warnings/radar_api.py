@@ -92,7 +92,7 @@ class RadarWarningApi:
             return (None, None)
     
         url = self.get_google_url(point)
-        http_timeout = 10
+        http_timeout = 15
         if self._session is None:
             self._session = aiohttp.ClientSession()
             self._close_session = True
@@ -136,7 +136,7 @@ class RadarWarningApi:
 
     async def get_pois(self):
         url = self.get_url()
-        http_timeout = 5
+        http_timeout = 15
         if self._session is None:
             self._session = aiohttp.ClientSession()
             self._close_session = True
