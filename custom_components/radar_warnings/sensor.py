@@ -168,7 +168,8 @@ class RadarMapWarningsSensor(GeolocationEvent):
         longitude: float
     ) -> None:
         """Initialize entity with data provided."""
-        self._attr_name = name
+        self._attr_name = f"{DOMAIN}_{name}"
+        self._attr_icon = "mdi:cctv"
         self._distance = distance
         self._latitude = latitude
         self._longitude = longitude
