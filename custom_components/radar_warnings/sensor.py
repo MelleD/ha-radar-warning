@@ -81,12 +81,7 @@ class MapManager:
 
     def _remove_entity(self) -> None:
         device_reg = dr.async_get(self._hass)
-        LOGGER.warn("Remove device1:")
-        device1 = device_reg.async_get_device("zoo_1")
-        self._hass.add_job(device1.async_remove())
-        device2 = device_reg.async_get_device("zoo_2")
-        self._hass.add_job(device2.async_remove())
-        LOGGER.warn("Removed devices:")
+        LOGGER.warn("_remove_entity:")
         max_iterations=1000
         for i in range(1,max_iterations):
             unique_id_radar = self._radar_map_name(i)
