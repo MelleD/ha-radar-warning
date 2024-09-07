@@ -23,7 +23,6 @@ class POI:
         self.vmax = vmax
         self.distance = distance
         self.adress = adress
-        self.adress_short= None
         self.adress_short= adress_short
 
     def __eq__(self, other):
@@ -87,9 +86,9 @@ class RadarWarningApi:
     def get_google_url(self, point: Point):
         return f"https://maps.googleapis.com/maps/api/geocode/json?latlng={point.latitude},{point.longitude}&key={self.google_api_key}"
 
-    async def get_adress(self, point: Point) -> str :
+    async def get_adress(self, point: Point, street: str | None) -> str :
         if self.google_api_key is None:
-            return (None, None)
+            return (None, None, street)
     
         url = self.get_google_url(point)
         http_timeout = 15
@@ -120,19 +119,18 @@ class RadarWarningApi:
         address_components = first_result['address_components']
         
         address_parts = []
+        if street is not None:
+            address_parts.append(street)
         for component in address_components:
             if 'locality' in component['types']:
                 address_parts.append(component['long_name'])
 
-            if 'route' in component['types']:
-                address_parts.append(component['long_name'])
+            if 'route' in component['types'] and street is None:
+                street = component['long_name']
+                address_parts.append(street)
         
-        # Die Adresse ohne Land zurückgeben
         adress_short =  ', '.join(address_parts)
-
-
-
-        return (formatted_address,adress_short)
+        return (formatted_address,adress_short,street)
 
     async def get_pois(self):
         url = self.get_url()
@@ -170,13 +168,14 @@ class RadarWarningApi:
             start_point = Point(self.latitude, self.longitude)
             end_point = Point(poi_data['lat'], poi_data['lng'])
             distance = geodesic(start_point, end_point).kilometers
-            adress, adress_short = await self.get_adress(end_point)
+            poi_street = poi_data.get('street', None)
+            adress, adress_short, street = await self.get_adress(end_point, poi_street)
             if distance <= self.radius_km:
                 poi = POI(
                     id=poi_data['id'],
                     latitude=poi_data['lat'],
                     longitude=poi_data['lng'],
-                    street=poi_data.get('street', ""),
+                    street=street,
                     vmax=poi_data['vmax'],
                     distance=distance,
                     adress=adress,

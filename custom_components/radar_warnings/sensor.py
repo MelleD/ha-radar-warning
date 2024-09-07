@@ -26,8 +26,7 @@ from .const import (
     DOMAIN,
     ATTR_LAST_UPDATE,
     ATTR_WARNING_COUNT,
-    API_ATTR_WARNING_DISTANCE, 
-    API_ATTR_WARNING_VMAX,
+    API_ATTR_WARNING_DISTANCE,
     LOGGER
 )
 
@@ -74,10 +73,14 @@ class MapManager:
         """Schedule regular updates based on configured time interval."""
         async_track_time_interval(
             self._hass,
-            lambda now: self._update_async_track_time_interval(),
+            lambda now: asyncio.create_task(self._update_async_track_time_interval()),
             self._coordinator.update_interval,
             cancel_on_shutdown=True,
         )
+
+    async def _update_async_track_time_interval(self) -> None:
+        """Async update"""
+        await asyncio.to_thread(self._update)
 
     def _remove_entity(self) -> None:
         device_reg = dr.async_get(self._hass)
@@ -91,10 +94,6 @@ class MapManager:
             if device is None:
                 return
             self._hass.add_job(device.async_remove())
-
-    async def _update_async_track_time_interval(self) -> None:
-        """Async update"""
-        await asyncio.to_thread(self._update)
 
     def _update(self) -> None:
         """Update Map entry."""
