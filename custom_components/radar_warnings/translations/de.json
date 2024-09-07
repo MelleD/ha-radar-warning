@@ -1,0 +1,18 @@
+{
+    "config": {
+      "step": {
+        "user": {
+          "data": {
+            "api_key": "API-Schlüssel",
+            "latitude": "Breitengrad",
+            "longitude": "Längengrad",
+            "name": "Name",
+            "radius": "Radius (km)",
+            "scan": "Scan intervall (minutes)",
+            "map": "Anzeigen POIs in Map"
+          },
+          "description": "Gib die Daten deiner Zone ein."
+        }
+      }
+    }
+  }

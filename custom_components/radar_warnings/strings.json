@@ -10,11 +10,11 @@
         "data": {
           "latitude": "[%key:common::config_flow::data::latitude%]",
           "longitude": "[%key:common::config_flow::data::longitude%]",
-          "radius": "Radar in km",
+          "radius": "[%key:component:radar_warnings::config::step::user::data::radius%]",
           "name": "[%key:common::config_flow::data::name%]",
           "api_key": "[%key:common::config_flow::data::api_key%]",
-          "scan_interval": "Scan interval in minutes",
-          "show_on_map": "Show Radar on map"
+          "scan_interval": "[%key:component:radar_warnings::config::step::user::data::scan%]",
+          "show_on_map": "[%key:component:radar_warnings::config::step::user::data::map%]"
         }
       }
     }

@@ -1,0 +1,15 @@
+{
+    "config": {
+      "step": {
+        "user": {
+          "data": {
+            "api_key": "API key",
+            "latitude": "Latitude",
+            "longitude": "Longitude",
+            "name": "Name"
+          },
+          "description": "Fill in the data of your solar panels. Please refer to the documentation if a field is unclear."
+        }
+      }
+    }
+  }
