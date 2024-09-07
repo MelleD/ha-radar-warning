@@ -94,6 +94,7 @@ class MapManager:
         LOGGER.warn("Update Map entry, devices to update: %d", len(self._managed_devices))
 
         for device in list(self._managed_devices):
+            LOGGER.warn("Remove device")
             self._managed_devices.remove(device)
             self._hass.add_job(device.async_remove())
 
@@ -104,6 +105,7 @@ class MapManager:
             new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
             self._managed_devices.append(new_device)    
         self._add_entities(self._managed_devices)
+        LOGGER.warn("Added New device")
 
 
 class RadarWarningsSensor(
@@ -171,13 +173,18 @@ class RadarMapWarningsSensor(GeolocationEvent):
         self._latitude = latitude
         self._longitude = longitude
         self._unit_of_measurement = UnitOfLength.KILOMETERS
+        self._attr_device_info = DeviceInfo(
+            identifiers={(DOMAIN, name)},
+            name="Radar Warnings",
+            entry_type=DeviceEntryType.SERVICE,
+        )
 
 
 
     @property
     def source(self) -> str:
         """Return source value of this external event."""
-        return "radar warnings"
+        return DOMAIN
 
     @property
     def distance(self) -> float | None:
