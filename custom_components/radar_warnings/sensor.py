@@ -19,7 +19,7 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers import device_registry as dr
 
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
-import asyncio
+from datetime import datetime
 
 from .const import (
     RADAR_WARNING_SENSOR,
@@ -73,14 +73,14 @@ class MapManager:
         """Schedule regular updates based on configured time interval."""
         async_track_time_interval(
             self._hass,
-            lambda now: asyncio.create_task(self._update_async_track_time_interval()),
+            self._update_async_track_time_interval,
             self._coordinator.update_interval,
             cancel_on_shutdown=True,
         )
 
-    async def _update_async_track_time_interval(self) -> None:
+    async def _update_async_track_time_interval(self, now: datetime | None = None) -> None:
         """Async update"""
-        await asyncio.to_thread(self._update)
+        await self._update()
 
     def _remove_entity(self) -> None:
         device_reg = dr.async_get(self._hass)
