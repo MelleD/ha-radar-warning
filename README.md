@@ -12,13 +12,11 @@ Radar warning integration for HomeAssistant
 
 *This integration has not yet been tested and is in beta phase*
 
-I give no guarantee for the functionality and no promise of lifelong maintenance, as I do the whole thing in my free time. Of course, I am happy about every contribution and PR
+I give no guarantee for the functionality and no promise of lifelong maintenance, as I do the whole thing in my free time. Of course, I am happy about every contribution and PR.
 
+This integration enables the detection and display of mobile speed cameras or radar traps within a specified radius around a given latitude and longitude. The speed cameras or radar traps are dynamically shown on the standard Home Assistant (HA) map.
 
-This integration displays speed camera/radar warnings from latitude and longitute in a specified radius (km).
-A sensor is currently being created which contains all POIs. 
-
-The plan is to display this on the standard HA map at some point.
+Additionally, with the use of the Google Geolocation API, formatted addresses of these radar traps are retrieved and displayed, offering precise location details. This enhances the overall user experience by providing both map visualizations and detailed address information within the monitored zone.
 
 ## Installation
 
@@ -70,10 +68,6 @@ You can (currently) make 40.000 request per month for free. After that you have 
 - Here you can monitor your API usage and set up alerts if needed.
 - To manage quotas, go to "API & Services" > "Quotas" and adjust your settings as necessary. e.g. 1250 request per day
 
-
-## Known issue
-- No marker on the standard map
-- config flow show no description for input strings
 
 ## Support
 
