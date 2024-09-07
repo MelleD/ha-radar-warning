@@ -56,7 +56,7 @@ class RadarWarningsConfigFlow(ConfigFlow, domain=DOMAIN):
                         ): cv.boolean,
                         vol.Optional(
                             CONF_API_KEY, default=None
-                        ): cv.boolean
+                        ): cv.string
                     }
                 ),
             )
