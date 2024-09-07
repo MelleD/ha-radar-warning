@@ -19,6 +19,7 @@ from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers import device_registry as dr
 
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
+import asyncio
 
 from .const import (
     RADAR_WARNING_SENSOR,
@@ -73,7 +74,7 @@ class MapManager:
         """Schedule regular updates based on configured time interval."""
         async_track_time_interval(
             self._hass,
-            lambda now: self._update(),
+            lambda now: self._update_async_track_time_interval(),
             self._coordinator.update_interval,
             cancel_on_shutdown=True,
         )
@@ -96,7 +97,11 @@ class MapManager:
                 return
             self._hass.add_job(device.async_remove())
 
-    async def _update(self) -> None:
+    async def _update_async_track_time_interval(self) -> None:
+        """Async update"""
+        await asyncio.to_thread(self._update)
+
+    def _update(self) -> None:
         """Update Map entry."""
         LOGGER.warn("Update Map entry, devices to update: %d", len(self._managed_devices))
         self._remove_entity()
@@ -112,7 +117,7 @@ class MapManager:
             LOGGER.warn("New device: %s", unique_id_radar)
             new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
             self._managed_devices.append(new_device)    
-        await self._add_entities(self._managed_devices)
+        self._add_entities(self._managed_devices)
         LOGGER.warn("Added New device")
     
     def _radar_map_name(self, count: int) -> str:
