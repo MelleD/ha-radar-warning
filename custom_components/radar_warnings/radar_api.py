@@ -170,7 +170,7 @@ class RadarWarningApi:
             start_point = Point(self.latitude, self.longitude)
             end_point = Point(poi_data['lat'], poi_data['lng'])
             distance = geodesic(start_point, end_point).kilometers
-            adress, adress_short = self.get_adress(end_point)
+            adress, adress_short = await self.get_adress(end_point)
             if distance <= self.radius_km:
                 poi = POI(
                     id=poi_data['id'],
