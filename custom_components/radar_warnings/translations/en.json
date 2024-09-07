@@ -1,14 +1,38 @@
 {
     "config": {
+      "abort": {
+        "already_configured": "Config name already exists"
+      },
       "step": {
         "user": {
           "data": {
-            "api_key": "API key",
+            "api_key": "Google GeoLocatio API key",
             "latitude": "Latitude",
             "longitude": "Longitude",
-            "name": "Name"
+            "name": "Name",
+            "radius": "Radius (km)",
+            "scan": "Scan intervall (minutes)",
+            "map": "Show POIs in map"
           },
-          "description": "Fill in the data of your solar panels. Please refer to the documentation if a field is unclear."
+          "description": "Fill in the data of your zone. The optional Api Key is used for the google GeoLocation Api"
+        }
+      }
+    },
+    "entity": {
+      "sensor": {
+        "radar_warnings": {
+          "name": "Radar warning count",
+          "state_attributes": {
+            "last_update": {
+              "name": "Last update"
+            },
+            "warning_count": {
+              "name": "Warning count"
+            },
+            "warnings": {
+              "name": "Warnings"
+            }
+          }
         }
       }
     }

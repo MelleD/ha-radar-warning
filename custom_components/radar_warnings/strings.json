@@ -2,7 +2,7 @@
   "title": "Radar warnings",
   "config": {
     "abort": {
-      "already_configured": "Config is already exist"
+      "already_configured": "[%key:common::config_flow::abort::already_configured%]"
     },
     "step": {
       "user": {
@@ -10,18 +10,18 @@
         "data": {
           "latitude": "[%key:common::config_flow::data::latitude%]",
           "longitude": "[%key:common::config_flow::data::longitude%]",
-          "radius": "[%key:component:radar_warnings::config::step::user::data::radius%]",
+          "radius": "[%key:common::config_flow::data::radius%]",
           "name": "[%key:common::config_flow::data::name%]",
           "api_key": "[%key:common::config_flow::data::api_key%]",
-          "scan_interval": "[%key:component:radar_warnings::config::step::user::data::scan%]",
-          "show_on_map": "[%key:component:radar_warnings::config::step::user::data::map%]"
+          "scan_interval": "[%key:common::config_flow::data::scan%]",
+          "show_on_map": "[%key:common::config_flow::data::map%]"
         }
       }
     }
   },
   "entity": {
     "sensor": {
-      "radar_warning": {
+      "radar_warnings": {
         "name": "Radar warning count",
         "state_attributes": {
           "last_update": {
@@ -29,6 +29,9 @@
           },
           "warning_count": {
             "name": "Warning count"
+          },
+          "warnings": {
+            "name": "Warnings"
           }
         }
       }

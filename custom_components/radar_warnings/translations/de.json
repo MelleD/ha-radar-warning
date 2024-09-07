@@ -1,9 +1,12 @@
 {
     "config": {
+      "abort": {
+        "already_configured": "Config name ist schon vorhanden"
+      },
       "step": {
         "user": {
           "data": {
-            "api_key": "API-Schlüssel",
+            "api_key": "Google GeoLocation API-Schlüssel",
             "latitude": "Breitengrad",
             "longitude": "Längengrad",
             "name": "Name",
@@ -11,8 +14,29 @@
             "scan": "Scan intervall (minutes)",
             "map": "Anzeigen POIs in Map"
           },
-          "description": "Gib die Daten deiner Zone ein."
+          "description": "Gib die Daten deiner Zone ein. Der optionale Api Key wird für die google GeoLocation Api verwendet"
         }
       }
+    },
+    "entity": {
+        "sensor": {
+          "current_warning_level": {
+            "name": "Current warning level",
+            "state_attributes": {
+              "region_name": {
+                "name": "Region name"
+              },
+              "region_id": {
+                "name": "Region ID"
+              },
+              "last_update": {
+                "name": "Last update"
+              },
+              "warning_count": {
+                "name": "Warning count"
+              }
+            }
+          }
+        }
     }
-  }
+}
