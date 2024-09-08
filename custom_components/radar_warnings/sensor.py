@@ -113,6 +113,8 @@ class MapManager:
     def _update(self) -> None:
         """Update Map entry."""
         LOGGER.warn("Update Map entry, devices to update: %d", len(self._managed_devices))
+        
+        self._remove_entity()
 
         pois = self._coordinator.api.pois
         for i, poi in enumerate(pois, 1):
