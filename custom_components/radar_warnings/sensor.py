@@ -9,7 +9,7 @@ from __future__ import annotations
 from typing import Any
 
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
-from homeassistant.core import HomeAssistant
+from homeassistant.core import HomeAssistant,callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
@@ -78,19 +78,34 @@ class MapManager:
             cancel_on_shutdown=True,
         )
 
-    async def _update_async_track_time_interval(self, now: datetime | None = None) -> None:
+    @callback
+    def _update_async_track_time_interval(self, now: datetime | None = None) -> None:
         """Async update"""
-        await self._update()
+        self._update()
 
     def _remove_entity(self) -> None:
         device_reg = dr.async_get(self._hass)
         LOGGER.warn("_remove_entity:")
+
+        for device in list(self._managed_devices):
+            self._managed_devices.remove(device)
+            self._hass.add_job(device.async_remove())
+
         max_iterations=1000
-        for i in range(1,max_iterations):
+        start =  len(self._managed_devices) + 1
+        for i in range(start,max_iterations):
             unique_id_radar = self._radar_map_name(i)
             LOGGER.warn("Remove device: %s", unique_id_radar)
+            #TODO
             device = device_reg.async_get_device(unique_id_radar)
-            LOGGER.warn("Remove Found device: %s", device)
+            LOGGER.warn("Remove Found device1: %s", device)
+            device = device_reg.async_get_device(f"sensor_{unique_id_radar}")
+            LOGGER.warn("Remove Found device2: %s", device)
+            id = f"{self._unique_id}_{i}"
+            device = device_reg.async_get_device(identifiers={(DOMAIN, id)})
+            LOGGER.warn("Remove Found device3: %s", device)
+            device = device_reg.async_get_device(identifiers={(DOMAIN, unique_id_radar)})
+            LOGGER.warn("Remove Found device4: %s", device)
             if device is None:
                 return
             self._hass.add_job(device.async_remove())
@@ -98,12 +113,6 @@ class MapManager:
     def _update(self) -> None:
         """Update Map entry."""
         LOGGER.warn("Update Map entry, devices to update: %d", len(self._managed_devices))
-        self._remove_entity()
-
-        #for device in list(self._managed_devices):
-        #    LOGGER.warn("Remove device 2")
-        #    self._managed_devices.remove(device)
-        #    self._hass.add_job(device.async_remove())
 
         pois = self._coordinator.api.pois
         for i, poi in enumerate(pois, 1):
