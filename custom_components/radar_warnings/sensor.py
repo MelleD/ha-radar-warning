@@ -108,11 +108,9 @@ class MapManager:
         pois = self._coordinator.api.pois
         for i, poi in enumerate(pois, 1):
             unique_id_radar = self._radar_map_name(i)
-            LOGGER.warn("New device: %s", unique_id_radar)
             new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
             self._managed_devices.append(new_device)    
         self._add_entities(self._managed_devices)
-        LOGGER.warn("Added New device")
     
     def _radar_map_name(self, count: int) -> str:
          """Radar Map Sensor name."""
