@@ -86,19 +86,19 @@ class MapManager:
 
     def _remove_entity(self) -> None:
         entity_reg = er.async_get(self._hass)
-        start =  len(self._managed_devices) + 1
-        for device in list(self._managed_devices):
-            self._managed_devices.remove(device)
-            self._hass.add_job(device.async_remove())
+        start = 1
+        #start =  len(self._managed_devices) + 1
+        #for device in list(self._managed_devices):
+        #    self._managed_devices.remove(device)
+        #    self._hass.add_job(device.async_remove())
            
-
         max_iterations=1000
         for i in range(start,max_iterations):
             unique_id_radar = self._radar_map_name(i)
             entity = entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
-            LOGGER.warn("Entity found: %s", entity)
-            if entity_id := entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar):
-                entity_reg.async_remove(entity_id)
+            if entity is None:
+                return
+            entity_reg.async_remove(entity)
 
 
     def _update(self) -> None:
