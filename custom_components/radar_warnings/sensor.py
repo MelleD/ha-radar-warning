@@ -90,13 +90,16 @@ class MapManager:
         start =  len(self._managed_devices) + 1
         for device in list(self._managed_devices):
             LOGGER.warn("Remove device: %s", device)
+            
             LOGGER.warn("entity_id : %s",  device.entity_id)
-            LOGGER.warn("unique_id : %s",  device.unique_id)
-            LOGGER.warn("identifiers : %s",  device.device_info.identifiers)
             device1 = device_reg.async_get_device(device.entity_id)
             LOGGER.warn("Remove Found device A: %s", device1)
-            device2 = device_reg.async_get_device(device.device_info.identifiers)
+
+            LOGGER.warn("identifiers : %s",  device._attr_device_info.identifiers)
+            device2 = device_reg.async_get_device(device._attr_device_info.identifiers)
             LOGGER.warn("Remove Found device B: %s", device2)
+            
+            LOGGER.warn("unique_id : %s",  device.unique_id)
             device3 = device_reg.async_get_device(device.unique_id)
             LOGGER.warn("Remove Found device C: %s", device3)
             self._managed_devices.remove(device)
