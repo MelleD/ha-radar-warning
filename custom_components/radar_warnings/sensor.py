@@ -153,7 +153,7 @@ class MapManager:
     
     def _radar_map_name(self, count: int) -> str:
          """Radar Map Sensor name."""
-         return f"{DOMAIN}_{self._unique_id}_{count}"
+         return f"{self._unique_id}_{count}"
 
 
 class RadarWarningsSensor(
@@ -202,7 +202,7 @@ class RadarWarningsSensor(
         """Could the device be accessed during the last update call."""
         return self.coordinator.api.last_update is not None
 
-class RadarMapWarningsSensor(GeolocationEvent):
+class RadarMapWarningsSensor(SensorEntity):
     """Representation of a Radar Warnings sensor."""
 
     _attr_attribution = "Data provided by Radar warnings"
@@ -210,20 +210,20 @@ class RadarMapWarningsSensor(GeolocationEvent):
 
     def __init__(
         self,
-        name: str,
+        unique_id: str,
         distance: float,
         latitude: float,
         longitude: float
     ) -> None:
         """Initialize entity with data provided."""
-        self._attr_name = name
+        self._attr_unique_id = unique_id
         self._attr_icon = "mdi:cctv"
         self._distance = distance
         self._latitude = latitude
         self._longitude = longitude
         self._unit_of_measurement = UnitOfLength.KILOMETERS
         self._attr_device_info = DeviceInfo(
-            identifiers={(DOMAIN, name)},
+            identifiers={(DOMAIN, unique_id)},
             name="Radar Warnings",
             entry_type=DeviceEntryType.SERVICE,
         )
