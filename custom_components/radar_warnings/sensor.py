@@ -16,7 +16,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.const import UnitOfLength
 from homeassistant.components.geo_location import GeolocationEvent
 from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
 from datetime import datetime
@@ -86,6 +86,9 @@ class MapManager:
 
     def _remove_entity(self) -> None:
         device_reg = dr.async_get(self._hass)
+        entity_registry = er.async_get(self._hass)
+
+
         LOGGER.warn("_remove_entity:")
         start =  len(self._managed_devices) + 1
         for device in list(self._managed_devices):
@@ -93,17 +96,27 @@ class MapManager:
             
             LOGGER.warn("entity_id : %s",  device.entity_id)
             device1 = device_reg.async_get_device(device.entity_id)
+            entity1 = entity_registry.async_get(device.entity_id)
             LOGGER.warn("Remove Found device A: %s", device1)
+            LOGGER.warn("Remove Found entity1 A: %s", entity1)
 
-            LOGGER.warn("identifiers : %s",  device._attr_device_info.identifiers)
-            device2 = device_reg.async_get_device(device._attr_device_info.identifiers)
+            LOGGER.warn("identifiers : %s",  {(DOMAIN, device.unique_id)})
+            device2 = device_reg.async_get_device(identifiers={(DOMAIN, device.unique_id)})
             LOGGER.warn("Remove Found device B: %s", device2)
-            
+
             LOGGER.warn("unique_id : %s",  device.unique_id)
             device3 = device_reg.async_get_device(device.unique_id)
+            entity3 = entity_registry.async_get(device.unique_id)
             LOGGER.warn("Remove Found device C: %s", device3)
+            LOGGER.warn("Remove Found entity1 A: %s", entity3)
+
+            LOGGER.warn("identifiers : %s",  {(DOMAIN, device.entity_id)})
+            device4 = device_reg.async_get_device(identifiers={(DOMAIN, device.entity_id)})
+            LOGGER.warn("Remove Found device D: %s", device4)
+
             self._managed_devices.remove(device)
             self._hass.add_job(device.async_remove())
+           
 
         max_iterations=1000
         for i in range(start,max_iterations):
