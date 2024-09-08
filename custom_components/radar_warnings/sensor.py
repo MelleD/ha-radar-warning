@@ -8,6 +8,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from homeassistant.components.sensor import DOMAIN as SENSOR_PLATFORM
 from homeassistant.components.sensor import SensorEntity, SensorEntityDescription
 from homeassistant.core import HomeAssistant,callback
 from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
@@ -15,7 +16,7 @@ from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.const import UnitOfLength
 from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.helpers import device_registry as dr
+from homeassistant.helpers import entity_registry as er
 
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE, ATTR_ICON, ATTR_UNIT_OF_MEASUREMENT
 from datetime import datetime
@@ -84,7 +85,7 @@ class MapManager:
         self._update()
 
     def _remove_entity(self) -> None:
-        device_reg = dr.async_get(self._hass)
+        entity_reg = er.async_get(self._hass)
         start =  len(self._managed_devices) + 1
         for device in list(self._managed_devices):
             self._managed_devices.remove(device)
@@ -94,10 +95,11 @@ class MapManager:
         max_iterations=1000
         for i in range(start,max_iterations):
             unique_id_radar = self._radar_map_name(i)
-            device = device_reg.async_get_device(identifiers={(DOMAIN, unique_id_radar)})
-            if device is None:
-                return
-            self._hass.add_job(device.async_remove())
+            entity = entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
+            LOGGER.warn("Entity found: %s", entity)
+            if entity_id := entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar):
+                entity_reg.async_remove(entity_id)
+
 
     def _update(self) -> None:
         """Update Map entry."""
