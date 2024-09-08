@@ -14,11 +14,10 @@ from homeassistant.helpers.device_registry import DeviceEntryType, DeviceInfo
 from homeassistant.helpers.entity_platform import AddEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from homeassistant.const import UnitOfLength
-from homeassistant.components.geo_location import GeolocationEvent
 from homeassistant.helpers.event import async_track_time_interval
-from homeassistant.helpers import device_registry as dr, entity_registry as er
+from homeassistant.helpers import device_registry as dr
 
-from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
+from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE, ATTR_ICON, ATTR_UNIT_OF_MEASUREMENT
 from datetime import datetime
 
 from .const import (
@@ -86,34 +85,8 @@ class MapManager:
 
     def _remove_entity(self) -> None:
         device_reg = dr.async_get(self._hass)
-        entity_registry = er.async_get(self._hass)
-
-
-        LOGGER.warn("_remove_entity:")
         start =  len(self._managed_devices) + 1
         for device in list(self._managed_devices):
-            LOGGER.warn("Remove device: %s", device)
-            
-            LOGGER.warn("entity_id : %s",  device.entity_id)
-            device1 = device_reg.async_get_device(device.entity_id)
-            entity1 = entity_registry.async_get(device.entity_id)
-            LOGGER.warn("Remove Found device A: %s", device1)
-            LOGGER.warn("Remove Found entity1 A: %s", entity1)
-
-            LOGGER.warn("identifiers : %s",  {(DOMAIN, device.unique_id)})
-            device2 = device_reg.async_get_device(identifiers={(DOMAIN, device.unique_id)})
-            LOGGER.warn("Remove Found device B: %s", device2)
-
-            LOGGER.warn("unique_id : %s",  device.unique_id)
-            device3 = device_reg.async_get_device(device.unique_id)
-            entity3 = entity_registry.async_get(device.unique_id)
-            LOGGER.warn("Remove Found device C: %s", device3)
-            LOGGER.warn("Remove Found entity1 A: %s", entity3)
-
-            LOGGER.warn("identifiers : %s",  {(DOMAIN, device.entity_id)})
-            device4 = device_reg.async_get_device(identifiers={(DOMAIN, device.entity_id)})
-            LOGGER.warn("Remove Found device D: %s", device4)
-
             self._managed_devices.remove(device)
             self._hass.add_job(device.async_remove())
            
@@ -121,25 +94,13 @@ class MapManager:
         max_iterations=1000
         for i in range(start,max_iterations):
             unique_id_radar = self._radar_map_name(i)
-            LOGGER.warn("Remove device: %s", unique_id_radar)
-            #TODO
-            device = device_reg.async_get_device(unique_id_radar)
-            LOGGER.warn("Remove Found device1: %s", device)
-            device = device_reg.async_get_device(f"sensor_{unique_id_radar}")
-            LOGGER.warn("Remove Found device2: %s", device)
-            id = f"{self._unique_id}_{i}"
-            device = device_reg.async_get_device(identifiers={(DOMAIN, id)})
-            LOGGER.warn("Remove Found device3: %s", device)
             device = device_reg.async_get_device(identifiers={(DOMAIN, unique_id_radar)})
-            LOGGER.warn("Remove Found device4: %s", device)
             if device is None:
                 return
             self._hass.add_job(device.async_remove())
 
     def _update(self) -> None:
         """Update Map entry."""
-        LOGGER.warn("Update Map entry, devices to update: %d", len(self._managed_devices))
-
         self._remove_entity()
 
         pois = self._coordinator.api.pois
@@ -228,29 +189,24 @@ class RadarMapWarningsSensor(SensorEntity):
             entry_type=DeviceEntryType.SERVICE,
         )
 
+    @property
+    def native_value(self) -> float | None:
+        """Return the state of the sensor."""
+        return self._distance
 
+    @property
+    def extra_state_attributes(self) -> dict[str, Any]:
+        """Return the state attributes of the sensor."""
+        data = {
+            ATTR_LATITUDE: self._latitude,
+            ATTR_LONGITUDE: self._longitude,
+            ATTR_UNIT_OF_MEASUREMENT: self._unit_of_measurement,
+            ATTR_ICON: self._attr_icon
+        }
+
+        return data
 
     @property
     def source(self) -> str:
         """Return source value of this external event."""
         return DOMAIN
-
-    @property
-    def distance(self) -> float | None:
-        """Return distance value of this external event."""
-        return self._distance
-
-    @property
-    def latitude(self) -> float | None:
-        """Return latitude value of this external event."""
-        return self._latitude
-
-    @property
-    def longitude(self) -> float | None:
-        """Return longitude value of this external event."""
-        return self._longitude
-
-    @property
-    def unit_of_measurement(self) -> str:
-        """Return the unit of measurement."""
-        return self._unit_of_measurement
