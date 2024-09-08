@@ -54,7 +54,8 @@ async def async_setup_entry(
     async_add_entities(
         [RadarWarningsSensor(coordinator, SENSOR_TYPE, unique_id)]
     )
-    MapManager(hass, coordinator, unique_id, async_add_entities)
+    if coordinator.show_map is True:
+        MapManager(hass, coordinator, unique_id, async_add_entities)
 
 class MapManager:
     """Device manager for geolocation events."""
@@ -86,13 +87,23 @@ class MapManager:
     def _remove_entity(self) -> None:
         device_reg = dr.async_get(self._hass)
         LOGGER.warn("_remove_entity:")
-
+        start =  len(self._managed_devices) + 1
         for device in list(self._managed_devices):
+            LOGGER.warn("Remove device: %s", device)
+            LOGGER.warn("entity_id : %s",  device.entity_id)
+            LOGGER.warn("unique_id : %s",  device.unique_id)
+            LOGGER.warn("identifiers : %s",  device.device_entry.identifiers)
+            device = device_reg.async_get_device(device.entity_id)
+            LOGGER.warn("Remove Found device A: %s", device)
+            device = device_reg.async_get_device(device.device_entry.identifiers)
+            LOGGER.warn("Remove Found device B: %s", device)
+            device = device_reg.async_get_device(device.unique_id)
+            LOGGER.warn("Remove Found device C: %s", device)
             self._managed_devices.remove(device)
             self._hass.add_job(device.async_remove())
 
         max_iterations=1000
-        start =  len(self._managed_devices) + 1
+       
         for i in range(start,max_iterations):
             unique_id_radar = self._radar_map_name(i)
             LOGGER.warn("Remove device: %s", unique_id_radar)
@@ -113,7 +124,7 @@ class MapManager:
     def _update(self) -> None:
         """Update Map entry."""
         LOGGER.warn("Update Map entry, devices to update: %d", len(self._managed_devices))
-        
+
         self._remove_entity()
 
         pois = self._coordinator.api.pois
