@@ -26,10 +26,17 @@ class POI:
         self.adress_short= adress_short
 
     def __eq__(self, other):
-        return self.id == other.id
+        if isinstance(other, POI):
+            id_equal = self.id == other.id
+            lat_equal = abs(self.latitude - other.latitude) < 1e-6
+            lon_equal = abs(self.longitude - other.longitude) < 1e-6
+            return id_equal or (lat_equal and lon_equal)
+        return False
 
     def __hash__(self):
-        return hash(self.id)
+        # Hash basierend auf ID, Latitude und Longitude
+        return hash((self.id, self.latitude, self.longitude))
+
     
     def to_json(self):
         return {
