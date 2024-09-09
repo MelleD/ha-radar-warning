@@ -96,8 +96,10 @@ class MapManager:
         for i in range(start,max_iterations):
             unique_id_radar = self._radar_map_name(i)
             entity = entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
+            LOGGER.warning(f"Removing id {unique_id_radar} with entity {entity}")
             if entity is None:
                 return
+            LOGGER.warning("Removing...")
             entity_reg.async_remove(entity)
 
 
