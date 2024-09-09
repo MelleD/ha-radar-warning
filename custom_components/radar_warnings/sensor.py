@@ -93,7 +93,6 @@ class MapManager:
             LOGGER.warning(f"Removing id {unique_id_radar} with entity {entity}")
             if entity is None:
                 return
-            LOGGER.warning("Removing...")
             entity_reg.async_remove(entity)
 
 
@@ -103,7 +102,7 @@ class MapManager:
         entity_reg = er.async_get(self._hass)
 
         new_devices = []
-        start = 1
+        start = 0
         for i, poi in enumerate(pois, 1):
             unique_id_radar = self._radar_map_name(i)
             entity_id = entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
@@ -111,6 +110,7 @@ class MapManager:
             if entity_id is not None:
                 LOGGER.warning(f"Update {entity_id}")
                 entity_state = self._hass.states.get(entity_id)
+                LOGGER.warning(f"Found entity_state {entity_state}")
                 if entity_state:
                     new_attributes = {
                         ATTR_LATITUDE: poi[ATTR_LATITUDE],
@@ -120,11 +120,13 @@ class MapManager:
                     LOGGER.warning(f"Update new_attributes {new_attributes}")
                     self._hass.states.set(entity_id, poi[API_ATTR_WARNING_DISTANCE], new_attributes)
             else:
-                LOGGER.warning("Add new")
                 new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
-                new_devices.append(new_device) 
-        self._add_entities(new_devices)
+                new_devices.append(new_device)
+        start = start + 1
+        LOGGER.warning(f"Remove start {start}")
         self._remove_entity(start)
+        LOGGER.warning(f"Add new devices {len(new_devices)}")
+        self._add_entities(new_devices)
         
     
     
