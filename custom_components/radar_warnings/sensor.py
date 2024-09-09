@@ -117,7 +117,7 @@ class MapManager:
                     ATTR_LONGITUDE: poi[ATTR_LONGITUDE],
                     ATTR_UNIT_OF_MEASUREMENT: UnitOfLength.KILOMETERS,
                     ATTR_ICON: "mdi:cctv",
-                    ATTR_ATTRIBUTION: "Data provided by Radar warnings"
+                    ATTR_ATTRIBUTION: "Data provided by cdn2.atudo.net/maps.googleapis.com"
                     }
 
                 LOGGER.debug(f"Update new_attributes {new_attributes}")
@@ -142,7 +142,7 @@ class RadarWarningsSensor(
 ):
     """Representation of a Radar Warnings sensor."""
 
-    _attr_attribution = "Data provided by Radar warnings"
+    _attr_attribution = "Data provided by cdn2.atudo.net/maps.googleapis.com"
 
     def __init__(
         self,
@@ -186,7 +186,7 @@ class RadarWarningsSensor(
 class RadarMapWarningsSensor(SensorEntity):
     """Representation of a Radar Warnings sensor."""
 
-    _attr_attribution = "Data provided by Radar warnings"
+    _attr_attribution = "Data provided by cdn2.atudo.net/maps.googleapis.com"
     _attr_should_poll = False
     _unrecorded_attributes = frozenset(
         {
