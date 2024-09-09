@@ -118,7 +118,13 @@ class MapManager:
                         **entity_state.attributes  # Vorhandene Attribute beibehalten
                     }
                     LOGGER.warning(f"Update new_attributes {new_attributes}")
-                    self._hass.states.set(entity_id, poi[API_ATTR_WARNING_DISTANCE], new_attributes)
+                    self._hass.states.async_set(entity_id, poi[API_ATTR_WARNING_DISTANCE], new_attributes)
+                    # Asynchrone Methode in den Event Loop übergeben
+                    #self._hass.async_add_job(
+                    #    self._hass.states.async_set, 
+                    #    entity_id, 
+                    #    poi[API_ATTR_WARNING_DISTANCE], 
+                    #    new_attributes#)
             else:
                 new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
                 new_devices.append(new_device)
@@ -126,7 +132,8 @@ class MapManager:
         LOGGER.warning(f"Remove start {start}")
         self._remove_entity(start)
         LOGGER.warning(f"Add new devices {len(new_devices)}")
-        self._add_entities(new_devices)
+        if new_devices:
+            self._add_entities(new_devices)
         
     
     
