@@ -6,6 +6,7 @@ https://cdn2.atudo.net
 
 from __future__ import annotations
 
+from hmac import new
 from typing import Any
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_PLATFORM
@@ -65,7 +66,6 @@ class MapManager:
         self._hass = hass
         self._coordinator = coordinator
         self._add_entities = add_entities
-        self._managed_devices: list[RadarMapWarningsSensor] = []
         self._unique_id = unique_id
         self._update()
         self._init_regular_updates()
@@ -84,14 +84,8 @@ class MapManager:
         """Async update"""
         self._update()
 
-    def _remove_entity(self) -> None:
+    def _remove_entity(self, start: int) -> None:
         entity_reg = er.async_get(self._hass)
-        start = 1
-        #start =  len(self._managed_devices) + 1
-        #for device in list(self._managed_devices):
-        #    self._managed_devices.remove(device)
-        #    self._hass.add_job(device.async_remove())
-           
         max_iterations=1000
         for i in range(start,max_iterations):
             unique_id_radar = self._radar_map_name(i)
@@ -104,15 +98,35 @@ class MapManager:
 
 
     def _update(self) -> None:
-        """Update Map entry."""
-        self._remove_entity()
-
+        """Update sensor entry."""
         pois = self._coordinator.api.pois
+        entity_reg = er.async_get(self._hass)
+
+        new_devices = []
+        start = 1
         for i, poi in enumerate(pois, 1):
             unique_id_radar = self._radar_map_name(i)
-            new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
-            self._managed_devices.append(new_device)    
-        self._add_entities(self._managed_devices)
+            entity_id = entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
+            start = i
+            if entity_id is not None:
+                LOGGER.warning(f"Update {entity_id}")
+                entity_state = self._hass.states.get(entity_id)
+                if entity_state:
+                    new_attributes = {
+                        ATTR_LATITUDE: poi[ATTR_LATITUDE],
+                        ATTR_LONGITUDE: poi[ATTR_LONGITUDE],
+                        **entity_state.attributes  # Vorhandene Attribute beibehalten
+                    }
+                    LOGGER.warning(f"Update new_attributes {new_attributes}")
+                    self._hass.states.set(entity_id, poi[API_ATTR_WARNING_DISTANCE], new_attributes)
+            else:
+                LOGGER.warning("Add new")
+                new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
+                new_devices.append(new_device) 
+        self._add_entities(new_devices)
+        self._remove_entity(start)
+        
+    
     
     def _radar_map_name(self, count: int) -> str:
          """Radar Map Sensor name."""
@@ -170,6 +184,14 @@ class RadarMapWarningsSensor(SensorEntity):
 
     _attr_attribution = "Data provided by Radar warnings"
     _attr_should_poll = False
+    _unrecorded_attributes = frozenset(
+        {
+            ATTR_UNIT_OF_MEASUREMENT,
+            ATTR_ICON,
+            ATTR_LATITUDE,
+            ATTR_LONGITUDE
+        }
+    )
 
     def __init__(
         self,
@@ -207,6 +229,13 @@ class RadarMapWarningsSensor(SensorEntity):
         }
 
         return data
+    
+    def update(self,  distance: float,latitude: float,longitude: float) -> None:
+        """Update the sensor."""
+        self._distance = distance
+        self._latitude = latitude
+        self._longitude = longitude
+        self.schedule_update_ha_state()
 
     @property
     def source(self) -> str:
