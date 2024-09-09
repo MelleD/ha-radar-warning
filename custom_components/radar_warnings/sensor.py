@@ -6,7 +6,6 @@ https://cdn2.atudo.net
 
 from __future__ import annotations
 
-from hmac import new
 from typing import Any
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_PLATFORM
@@ -108,30 +107,29 @@ class MapManager:
             entity_id = entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
             start = i
             if entity_id is not None:
-                LOGGER.warning(f"Update {entity_id}")
                 entity_state = self._hass.states.get(entity_id)
-                LOGGER.warning(f"Found entity_state {entity_state}")
+                LOGGER.debug(f"Found entity_state {entity_state}")
+                new_attributes = {
+                    ATTR_LATITUDE: poi[ATTR_LATITUDE],
+                    ATTR_LONGITUDE: poi[ATTR_LONGITUDE],
+                    ATTR_UNIT_OF_MEASUREMENT: UnitOfLength.KILOMETERS,
+                    ATTR_ICON: "mdi:cctv"
+                    }
                 if entity_state:
                     new_attributes = {
                         ATTR_LATITUDE: poi[ATTR_LATITUDE],
                         ATTR_LONGITUDE: poi[ATTR_LONGITUDE],
                         **entity_state.attributes  # Vorhandene Attribute beibehalten
                     }
-                    LOGGER.warning(f"Update new_attributes {new_attributes}")
-                    self._hass.states.async_set(entity_id, poi[API_ATTR_WARNING_DISTANCE], new_attributes)
-                    # Asynchrone Methode in den Event Loop übergeben
-                    #self._hass.async_add_job(
-                    #    self._hass.states.async_set, 
-                    #    entity_id, 
-                    #    poi[API_ATTR_WARNING_DISTANCE], 
-                    #    new_attributes#)
+
+                LOGGER.debug(f"Update new_attributes {new_attributes}")
+                self._hass.states.async_set(entity_id, poi[API_ATTR_WARNING_DISTANCE], new_attributes)
+    
             else:
                 new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
                 new_devices.append(new_device)
         start = start + 1
-        LOGGER.warning(f"Remove start {start}")
         self._remove_entity(start)
-        LOGGER.warning(f"Add new devices {len(new_devices)}")
         if new_devices:
             self._add_entities(new_devices)
         
