@@ -6,6 +6,7 @@ https://cdn2.atudo.net
 
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any
 
 from homeassistant.components.sensor import DOMAIN as SENSOR_PLATFORM
@@ -18,7 +19,7 @@ from homeassistant.const import UnitOfLength
 from homeassistant.helpers.event import async_track_time_interval
 from homeassistant.helpers import entity_registry as er
 
-from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE, ATTR_ICON, ATTR_UNIT_OF_MEASUREMENT
+from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE, ATTR_ICON, ATTR_UNIT_OF_MEASUREMENT, ATTR_ATTRIBUTION
 from datetime import datetime
 
 from .const import (
@@ -66,15 +67,19 @@ class MapManager:
         self._coordinator = coordinator
         self._add_entities = add_entities
         self._unique_id = unique_id
+        self._entity_reg = er.async_get(self._hass)
         self._update()
         self._init_regular_updates()
 
     def _init_regular_updates(self) -> None:
         """Schedule regular updates based on configured time interval."""
+        if self._coordinator.update_interval is None:
+            return
+        time_interval = self._coordinator.update_interval + timedelta(minutes=1)
         async_track_time_interval(
             self._hass,
             self._update_async_track_time_interval,
-            self._coordinator.update_interval,
+            time_interval,
             cancel_on_shutdown=True,
         )
 
@@ -84,27 +89,25 @@ class MapManager:
         self._update()
 
     def _remove_entity(self, start: int) -> None:
-        entity_reg = er.async_get(self._hass)
         max_iterations=1000
         for i in range(start,max_iterations):
             unique_id_radar = self._radar_map_name(i)
-            entity = entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
+            entity = self._entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
             LOGGER.warning(f"Removing id {unique_id_radar} with entity {entity}")
             if entity is None:
                 return
-            entity_reg.async_remove(entity)
+            self._entity_reg.async_remove(entity)
 
 
     def _update(self) -> None:
         """Update sensor entry."""
         pois = self._coordinator.api.pois
-        entity_reg = er.async_get(self._hass)
 
         new_devices = []
         start = 0
         for i, poi in enumerate(pois, 1):
             unique_id_radar = self._radar_map_name(i)
-            entity_id = entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
+            entity_id = self._entity_reg.async_get_entity_id(SENSOR_PLATFORM, DOMAIN, unique_id_radar)
             start = i
             if entity_id is not None:
                 entity_state = self._hass.states.get(entity_id)
@@ -113,18 +116,12 @@ class MapManager:
                     ATTR_LATITUDE: poi[ATTR_LATITUDE],
                     ATTR_LONGITUDE: poi[ATTR_LONGITUDE],
                     ATTR_UNIT_OF_MEASUREMENT: UnitOfLength.KILOMETERS,
-                    ATTR_ICON: "mdi:cctv"
-                    }
-                if entity_state:
-                    new_attributes = {
-                        ATTR_LATITUDE: poi[ATTR_LATITUDE],
-                        ATTR_LONGITUDE: poi[ATTR_LONGITUDE],
-                        **entity_state.attributes  # Vorhandene Attribute beibehalten
+                    ATTR_ICON: "mdi:cctv",
+                    ATTR_ATTRIBUTION: "Data provided by Radar warnings"
                     }
 
                 LOGGER.debug(f"Update new_attributes {new_attributes}")
                 self._hass.states.async_set(entity_id, poi[API_ATTR_WARNING_DISTANCE], new_attributes)
-    
             else:
                 new_device = RadarMapWarningsSensor(unique_id_radar,poi[API_ATTR_WARNING_DISTANCE],poi[ATTR_LATITUDE],poi[ATTR_LONGITUDE])  
                 new_devices.append(new_device)
@@ -196,7 +193,8 @@ class RadarMapWarningsSensor(SensorEntity):
             ATTR_UNIT_OF_MEASUREMENT,
             ATTR_ICON,
             ATTR_LATITUDE,
-            ATTR_LONGITUDE
+            ATTR_LONGITUDE,
+            ATTR_ATTRIBUTION
         }
     )
 
