@@ -16,7 +16,7 @@ I give no guarantee for the functionality and no promise of lifelong maintenance
 
 This integration enables the detection and display of mobile speed cameras or radar traps within a specified radius around a given latitude and longitude. The speed cameras or radar traps are dynamically shown on the standard Home Assistant (HA) map.
 
-Additionally, with the use of the Google Geolocation API, formatted addresses of these radar traps are retrieved and displayed, offering precise location details. This enhances the overall user experience by providing both map visualizations and detailed address information within the monitored zone.
+Additionally, with the use of the Google Geocoding API, formatted addresses of these radar traps are retrieved and displayed, offering precise location details. This enhances the overall user experience by providing both map visualizations and detailed address information within the monitored zone.
 
 ## Installation
 
@@ -30,9 +30,9 @@ The Radar integeration is not available in [HACS][hacs] (Home Assistant Communit
 
 [![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?owner=MelleD&repository=ha-radar-warning&category=plugin)
 
-## Google Geolocation API Setup
+## Google Geocoding API Setup
 
-The Google Geolocation API allows you to determine and process location data. This is optional and improves the adress data for the POIs. This guide outlines the steps to set up and use the Google Geolocation API.
+The Google Geocoding API allows you to determine and process location data. This is optional and improves the adress data for the POIs. This guide outlines the steps to set up and use the Google Geocoding API.
 
 ### Prerequisites
 - A Google Cloud account
@@ -46,11 +46,11 @@ The Google Geolocation API allows you to determine and process location data. Th
 - Enter a project name and billing account (if prompted), then click "Create".
 - Make a note of your Project ID, as you'll need it later.
 
-#### 2. Enable the Geolocation API
+#### 2. Enable the Geocoding API
 - In the Google Cloud Console, navigate to the "API & Services" section.
 - Click on "Library" to view available APIs.
-- Search for "Geolocation API" in the search bar.
-- Click on "Geolocation API" and then click "Enable".
+- Search for "Geocoding API" in the search bar.
+- Click on "Geocoding API" and then click "Enable".
 
 #### 3. Set Up Billing
 Google Cloud requires billing information to use most of its APIs.
