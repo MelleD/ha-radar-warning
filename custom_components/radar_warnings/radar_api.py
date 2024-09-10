@@ -118,7 +118,7 @@ class RadarWarningApi:
         if response.status // 100 in [4, 5]:
             contents = await response.read()
             response.close()
-            raise RadarWarningConnectionError(
+            raise RadarWarningConnectionError("HTTP error occurred",
                 response.status, json.loads(contents.decode("utf8"))
             )
 
@@ -162,7 +162,7 @@ class RadarWarningApi:
         if response.status // 100 in [4, 5]:
             contents = await response.read()
             response.close()
-            raise RadarWarningConnectionError(
+            raise RadarWarningConnectionError("HTTP error occurred",
                 response.status, json.loads(contents.decode("utf8"))
             )
 
