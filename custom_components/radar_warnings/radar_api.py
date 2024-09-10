@@ -10,12 +10,12 @@ from datetime import UTC, datetime
 
 from .exceptions import RadarWarningConnectionError
 
-from .const import LOGGER, API_ATTR_WARNING_ID, API_ATTR_WARNING_DISTANCE, API_ATTR_WARNING_STREET, API_ATTR_WARNING_VMAX, API_ATTR_WARNING_ADRESS, API_ATTR_WARNING_ADRESS_SHORT
+from .const import LOGGER, API_ATTR_WARNING_ID, API_ATTR_WARNING_DISTANCE, API_ATTR_WARNING_STREET, API_ATTR_WARNING_VMAX, API_ATTR_WARNING_ADRESS, API_ATTR_WARNING_ADRESS_SHORT,API_ATTR_WARNING_CITY
 from homeassistant.const import ATTR_LATITUDE, ATTR_LONGITUDE
 
 
 class POI:
-    def __init__(self, id, latitude, longitude, street, vmax, distance, adress: str | None = None, adress_short: str | None = None):
+    def __init__(self, id, latitude, longitude, street, vmax, distance, adress: str | None = None, adress_short: str | None = None, city: str | None = None):
         self.id = id
         self.latitude = float(latitude)
         self.longitude = float(longitude)
@@ -24,6 +24,7 @@ class POI:
         self.distance = distance
         self.adress = adress
         self.adress_short= adress_short
+        self.city = city
 
     def __eq__(self, other):
         if isinstance(other, POI):
@@ -47,7 +48,8 @@ class POI:
             API_ATTR_WARNING_VMAX: self.vmax,
             API_ATTR_WARNING_DISTANCE: self.distance,
             API_ATTR_WARNING_ADRESS: self.adress,
-            API_ATTR_WARNING_ADRESS_SHORT: self.adress_short
+            API_ATTR_WARNING_ADRESS_SHORT: self.adress_short,
+            API_ATTR_WARNING_CITY: self.city
         }
 
     def __repr__(self):
@@ -93,9 +95,9 @@ class RadarWarningApi:
     def get_google_url(self, point: Point):
         return f"https://maps.googleapis.com/maps/api/geocode/json?latlng={point.latitude},{point.longitude}&key={self.google_api_key}"
 
-    async def get_adress(self, point: Point, street: str | None) -> tuple[str | None, str | None, str | None]:
+    async def get_adress(self, point: Point, street: str | None) -> tuple[str | None, str | None, str | None, str | None]:
         if self.google_api_key is None:
-            return (None, None, street)
+            return (street, street, street, None)
     
         url = self.get_google_url(point)
         http_timeout = 15
@@ -126,21 +128,19 @@ class RadarWarningApi:
             formatted_address = first_result['formatted_address']
             address_components = first_result['address_components']
             
-            address_parts = []
-            if street is not None:
-                address_parts.append(street)
+            city = "unknown"
             for component in address_components:
                 if 'locality' in component['types']:
-                    address_parts.append(component['long_name'])
+                    city = component['long_name']
 
                 if 'route' in component['types'] and street is None:
                     street = component['long_name']
-                    address_parts.append(street)
+
             
-            adress_short =  ', '.join(address_parts)
-            return (formatted_address,adress_short,street)
+            adress_short =  f"{street}, {city}"
+            return (formatted_address,adress_short,street,city)
         
-        return (street, street, street)
+        return (street, street, street, None)
 
     async def get_pois(self):
         url = self.get_url()
@@ -180,7 +180,7 @@ class RadarWarningApi:
                 distance = geodesic(start_point, end_point).kilometers
                 if distance <= self.radius_km:
                     poi_street = poi_data.get('street', None)
-                    adress, adress_short, street = await self.get_adress(end_point, poi_street)
+                    adress, adress_short, street, city = await self.get_adress(end_point, poi_street)
                     poi = POI(
                         id=poi_data['id'],
                         latitude=poi_data['lat'],
@@ -189,7 +189,8 @@ class RadarWarningApi:
                         vmax=poi_data['vmax'],
                         distance=distance,
                         adress=adress,
-                        adress_short = adress_short
+                        adress_short = adress_short,
+                        city = city
                     ).to_json()
                     pois.append(poi)
         return pois
