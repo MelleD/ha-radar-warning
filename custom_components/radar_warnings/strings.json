@@ -6,7 +6,7 @@
     },
     "step": {
       "user": {
-        "description": "To identify the desired zone, enter the attributes 'latitude' and 'longitude'. The optional Api Key is used for the google GeoLocation Api",
+        "description": "To identify the desired zone, enter the attributes 'latitude' and 'longitude'. The optional Api Key is used for the google Geocoding Api",
         "data": {
           "latitude": "[%key:common::config_flow::data::latitude%]",
           "longitude": "[%key:common::config_flow::data::longitude%]",

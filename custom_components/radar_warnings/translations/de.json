@@ -6,7 +6,7 @@
       "step": {
         "user": {
           "data": {
-            "api_key": "Google GeoLocation API-Schlüssel",
+            "api_key": "Google Geocoding API-Schlüssel",
             "latitude": "Breitengrad",
             "longitude": "Längengrad",
             "name": "Name",
@@ -14,7 +14,7 @@
             "scan_interval": "Scan intervall (minutes)",
             "show_on_map": "Anzeigen POIs in Map"
           },
-          "description": "Gib die Daten deiner Zone ein. Der optionale Api Key wird für die google GeoLocation Api verwendet"
+          "description": "Gib die Daten deiner Zone ein. Der optionale Api Key wird für die google Geocoding Api verwendet"
         }
       }
     },

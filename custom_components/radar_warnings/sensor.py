@@ -59,10 +59,10 @@ async def async_setup_entry(
         MapManager(hass, coordinator, unique_id, async_add_entities)
 
 class MapManager:
-    """Device manager for geolocation events."""
+    """Device manager for Geocoding events."""
 
     def __init__(self, hass: HomeAssistant ,coordinator: RadarWarningsCoordinator,unique_id:str, add_entities: AddEntitiesCallback) -> None:
-        """Initialise the demo geolocation event manager."""
+        """Initialise the demo Geocoding event manager."""
         self._hass = hass
         self._coordinator = coordinator
         self._add_entities = add_entities
