@@ -22,6 +22,7 @@ API_ATTR_WARNING_VMAX: Final = "vmax"
 API_ATTR_WARNING_DISTANCE="distance"
 API_ATTR_WARNING_ADRESS="adress"
 API_ATTR_WARNING_ADRESS_SHORT="adress_short"
+API_ATTR_WARNING_CITY="city"
 
 DEFAULT_NAME: Final = "Radar Warnings"
 
