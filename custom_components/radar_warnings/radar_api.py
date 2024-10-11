@@ -186,7 +186,7 @@ class RadarWarningApi:
                         latitude=poi_data['lat'],
                         longitude=poi_data['lng'],
                         street=street,
-                        vmax=poi_data['vmax'],
+                        vmax=poi_data.get('vmax',0),
                         distance=distance,
                         adress=adress,
                         adress_short = adress_short,
